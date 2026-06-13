@@ -10,7 +10,7 @@
       id:'accueil', label:'Accueil', short:'Shuklel', kicker:'Montréal nocturne', title:'Shuklel',
       description:'Artiste, producteur et rappeur basé à Montréal, Shuklel fusionne rap, afro-beat et synthwave. Plus de 150 000 écoutes et 5 000 abonnés soutiennent déjà son parcours.',
       poster:'assets/city/logo.webp', mediaClass:'logo-fit', accent:0xd9e2eb, light:'#d9e2eb',
-      road:{x:-24,z:0}, building:{x:-24,z:-9,w:4.2,h:9.4,d:4.2},
+      road:{x:-24,z:0}, building:{x:-24,z:-6.35,w:7.2,h:8.8,d:3.0},
       actions:[
         {kind:'link', label:'YouTube', href:'https://www.youtube.com/@shuklel'},
         {kind:'link', label:'Instagram', href:'https://www.instagram.com/ultimate_dini/'},
@@ -21,7 +21,7 @@
       id:'album', label:'Album', short:'RS Vol.2', kicker:'Projet mis en avant', title:'Rigide et Scrupuleux Vol.2',
       description:'Une direction artistique sombre, premium et urbaine : chrome, nuit, ville et tension cinématique autour du nouveau projet.',
       poster:'assets/cover.webp', accent:0xd6ae72, light:'#d6ae72',
-      road:{x:-16,z:0}, building:{x:-16,z:9,w:4.8,h:12.6,d:4.4},
+      road:{x:-16,z:0}, building:{x:-16,z:6.35,w:8.0,h:10.8,d:3.1},
       actions:[
         {kind:'link', label:'Écouter le projet', href:'https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux'},
         {kind:'go', label:'Discographie', target:'music'},
@@ -32,35 +32,35 @@
       id:'music', label:'Musique', short:'Music', kicker:'Catalogue', title:'Discographie',
       description:'Les projets Shuklel réunis comme des affiches sur la skyline : chaque façade ouvre vers un album, un univers ou une époque.',
       poster:'assets/city/rigide.webp', accent:0x4eb7c7, light:'#4eb7c7',
-      road:{x:-8,z:0}, building:{x:-8,z:-9,w:4.4,h:11.2,d:4.2},
+      road:{x:-8,z:0}, building:{x:-8,z:-6.35,w:7.7,h:10.2,d:3.0},
       type:'music'
     },
     {
       id:'book', label:'Livre', short:'Livre', kicker:'Livre', title:'De la méthode rigide et scrupuleuse',
       description:'Le livre prolonge l’univers du projet avec une pièce numérique à 5 $.',
       poster:'assets/cover.webp', accent:0xb82935, light:'#b82935',
-      road:{x:0,z:0}, building:{x:0,z:9,w:4.6,h:10.4,d:4.4},
+      road:{x:0,z:0}, building:{x:0,z:6.35,w:7.5,h:9.8,d:3.0},
       type:'book'
     },
     {
       id:'merch', label:'Vêtements', short:'Merch', kicker:'Boutique', title:'Vêtements Shuklel',
       description:'Hoodie et t-shirt dans l’esthétique sombre du projet, accessibles directement depuis le quartier merch.',
       poster:'assets/city/hoodie-1.webp', accent:0x72b77b, light:'#72b77b',
-      road:{x:8,z:0}, building:{x:8,z:-9,w:5,h:11.9,d:4.6},
+      road:{x:8,z:0}, building:{x:8,z:-6.35,w:7.8,h:10.6,d:3.1},
       type:'merch'
     },
     {
       id:'cart', label:'Panier', short:'Panier', kicker:'Commande', title:'Panier',
       description:'Les articles ajoutés restent disponibles pendant la visite.',
       poster:'assets/city/logo.webp', accent:0xf0b64d, light:'#f0b64d',
-      road:{x:16,z:0}, building:{x:16,z:9,w:4.2,h:9.7,d:4},
+      road:{x:16,z:0}, building:{x:16,z:6.35,w:7.2,h:8.9,d:3.0},
       type:'cart'
     },
     {
       id:'contact', label:'Contact', short:'Contact', kicker:'Réseaux', title:'Contact & Réseaux',
       description:'Booking, questions, précommande ou collaboration : le bureau reste ouvert au bout de la route.',
       poster:'assets/city/logo.webp', accent:0xd9e2eb, light:'#d9e2eb',
-      road:{x:24,z:0}, building:{x:24,z:-9,w:4.6,h:10.8,d:4.4},
+      road:{x:24,z:0}, building:{x:24,z:-6.35,w:7.4,h:9.7,d:3.0},
       type:'contact'
     }
   ];
@@ -132,7 +132,32 @@
         return;
       }
       const gallery = event.target.closest('[data-gallery-next]');
-      if(gallery) nextProductImage(gallery.dataset.galleryNext);
+      if(gallery){
+        nextProductImage(gallery.dataset.galleryNext);
+        return;
+      }
+      const openViewer = event.target.closest('[data-open-viewer]');
+      if(openViewer){
+        const productImage = document.getElementById(openViewer.dataset.openViewer + '-image');
+        openProductViewer(openViewer.dataset.openViewer, Number(productImage?.dataset.index || 0));
+        return;
+      }
+      const viewerStep = event.target.closest('[data-viewer-step]');
+      if(viewerStep){
+        stepProductViewer(viewerStep.dataset.viewerProduct, Number(viewerStep.dataset.viewerStep));
+        return;
+      }
+      if(event.target.closest('[data-viewer-close]') || event.target.classList.contains('product-viewer')){
+        closeProductViewer();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const viewer = document.querySelector('.product-viewer');
+      if(!viewer) return;
+      if(event.key === 'Escape') closeProductViewer();
+      if(event.key === 'ArrowRight') stepProductViewer(viewer.dataset.product, 1);
+      if(event.key === 'ArrowLeft') stepProductViewer(viewer.dataset.product, -1);
     });
   }
 
@@ -231,12 +256,13 @@
       <div class="product-list">
         ${products.map((product) => `
           <div class="product-row">
-            <img src="${localAsset(product.image)}" alt="${product.title}" id="${product.id}-image" />
+            <img class="product-thumb" src="${localAsset(product.image)}" alt="${product.title}" id="${product.id}-image" data-index="0" data-open-viewer="${product.id}" />
             <div>
               <div class="row-title">${product.title}</div>
               <div class="row-meta">${product.price} $</div>
               <div class="row-actions">
-                <button class="tiny-action" type="button" data-gallery-next="${product.id}">Voir</button>
+                <button class="tiny-action" type="button" data-open-viewer="${product.id}">Agrandir</button>
+                <button class="tiny-action" type="button" data-gallery-next="${product.id}">Suivant</button>
                 <button class="tiny-action" type="button" data-buy-now data-product="${product.title}" data-price="${product.price}" data-zone="paypal-zone-${product.id}">Acheter</button>
                 <button class="tiny-action" type="button" data-add-cart data-product="${product.title}" data-price="${product.price}">Ajouter</button>
               </div>
@@ -373,6 +399,49 @@
     img.src = localAsset(product.gallery[next]);
   }
 
+  function openProductViewer(id, index = 0){
+    const product = products.find((item) => item.id === id);
+    if(!product) return;
+    closeProductViewer();
+    const viewer = document.createElement('div');
+    viewer.className = 'product-viewer';
+    viewer.dataset.product = id;
+    viewer.dataset.index = String(index);
+    viewer.innerHTML = productViewerMarkup(product, index);
+    document.body.appendChild(viewer);
+  }
+
+  function productViewerMarkup(product, index){
+    const image = localAsset(product.gallery[index]);
+    return `
+      <div class="product-viewer-card" role="dialog" aria-modal="true" aria-label="${product.title}">
+        <button class="viewer-close" type="button" data-viewer-close aria-label="Fermer">×</button>
+        <button class="viewer-arrow viewer-prev" type="button" data-viewer-product="${product.id}" data-viewer-step="-1" aria-label="Image précédente">‹</button>
+        <img class="viewer-image" src="${image}" alt="${product.title}" />
+        <button class="viewer-arrow viewer-next" type="button" data-viewer-product="${product.id}" data-viewer-step="1" aria-label="Image suivante">›</button>
+        <div class="viewer-caption">
+          <strong>${product.title}</strong>
+          <span>${product.price} $</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function stepProductViewer(id, delta){
+    const product = products.find((item) => item.id === id);
+    const viewer = document.querySelector('.product-viewer');
+    if(!product || !viewer) return;
+    const current = Number(viewer.dataset.index || 0);
+    const next = (current + delta + product.gallery.length) % product.gallery.length;
+    viewer.dataset.index = String(next);
+    viewer.innerHTML = productViewerMarkup(product, next);
+  }
+
+  function closeProductViewer(){
+    const viewer = document.querySelector('.product-viewer');
+    if(viewer) viewer.remove();
+  }
+
   function setupThree(){
     const mount = document.getElementById('cityCanvas');
     if(!window.THREE){
@@ -390,6 +459,9 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     mount.appendChild(renderer.domElement);
@@ -503,10 +575,11 @@
     group.userData.stopId = stop.id;
 
     const windowTexture = createWindowTexture(stop.light, index + 4);
+    windowTexture.repeat.set(Math.max(1.8, b.w / 2.7), Math.max(1.4, b.h / 5.2));
     const material = new THREE.MeshStandardMaterial({
       color:0x151d27,
-      roughness:.46,
-      metalness:.34,
+      roughness:.38,
+      metalness:.42,
       map:windowTexture,
       emissive:new THREE.Color(stop.accent),
       emissiveIntensity:.025
@@ -519,19 +592,54 @@
     group.add(tower);
     interactive.push(tower);
 
+    const base = new THREE.Mesh(
+      new THREE.BoxGeometry(b.w + .85, .72, b.d + .55),
+      new THREE.MeshStandardMaterial({color:0x0b1017, roughness:.32, metalness:.62})
+    );
+    base.position.y = .36;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    group.add(base);
+
+    const trimMat = new THREE.MeshStandardMaterial({
+      color:0xb9c7d3,
+      roughness:.22,
+      metalness:.86,
+      emissive:new THREE.Color(stop.accent),
+      emissiveIntensity:.045
+    });
+    [-1,1].forEach((side) => {
+      const trim = new THREE.Mesh(new THREE.BoxGeometry(.12, b.h * .9, .16), trimMat);
+      trim.position.set(side * (b.w / 2 + .09), b.h * .51, b.z < 0 ? b.d / 2 + .08 : -b.d / 2 - .08);
+      group.add(trim);
+    });
+
     const cap = new THREE.Mesh(
-      new THREE.BoxGeometry(b.w + .36, .22, b.d + .36),
+      new THREE.BoxGeometry(b.w + .72, .24, b.d + .72),
       new THREE.MeshStandardMaterial({color:0x2b3541, metalness:.72, roughness:.28})
     );
     cap.position.y = b.h + .13;
     group.add(cap);
 
     const frontZ = b.z < 0 ? b.d / 2 + .035 : -b.d / 2 - .035;
-    const poster = createPoster(stop, b.z < 0 ? 0 : Math.PI);
-    poster.position.set(0, Math.min(b.h * .56, 6.8), frontZ);
+    const poster = createPoster(stop, b, b.z < 0 ? 0 : Math.PI);
+    const posterY = Math.min(b.h * .55, 6.15);
+    const posterOffset = b.z < 0 ? .05 : -.05;
+    const frame = new THREE.Mesh(
+      new THREE.PlaneGeometry(poster.userData.posterW + .32, poster.userData.posterH + .32),
+      new THREE.MeshBasicMaterial({color:0x080b10})
+    );
+    frame.rotation.y = b.z < 0 ? 0 : Math.PI;
+    frame.position.set(0, posterY, frontZ + posterOffset * .5);
+    group.add(frame);
+    poster.position.set(0, posterY, frontZ + posterOffset);
     poster.userData.stopId = stop.id;
     group.add(poster);
     interactive.push(poster);
+
+    const canopy = new THREE.Mesh(new THREE.BoxGeometry(poster.userData.posterW + .75, .16, .34), trimMat);
+    canopy.position.set(0, posterY + poster.userData.posterH / 2 + .28, frontZ + posterOffset * .75);
+    group.add(canopy);
 
     const label = createLabel(stop.short, stop.light);
     label.position.set(0, b.h + .55, frontZ + (b.z < 0 ? .04 : -.04));
@@ -547,12 +655,19 @@
     return group;
   }
 
-  function createPoster(stop, rotationY){
+  function createPoster(stop, building, rotationY){
     const texture = textureLoader.load(localAsset(stop.poster));
     texture.encoding = THREE.sRGBEncoding;
-    const mat = new THREE.MeshBasicMaterial({map:texture});
-    const poster = new THREE.Mesh(new THREE.PlaneGeometry(2.75, 3.72), mat);
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    const mat = new THREE.MeshBasicMaterial({map:texture, toneMapped:false});
+    const posterW = Math.min(building.w * .76, 6.1);
+    const posterH = posterW;
+    const poster = new THREE.Mesh(new THREE.PlaneGeometry(posterW, posterH), mat);
     poster.rotation.y = rotationY;
+    poster.userData.posterW = posterW;
+    poster.userData.posterH = posterH;
     return poster;
   }
 
@@ -611,24 +726,24 @@
 
   function addSkyline(){
     const matColors = [0x0c121a,0x121922,0x151d27,0x0e151d];
-    for(let i = 0; i < 46; i += 1){
+    for(let i = 0; i < 28; i += 1){
       const side = i % 2 === 0 ? -1 : 1;
-      const x = -34 + i * 1.55 + (Math.random() - .5) * 1.8;
-      const z = side * (18 + Math.random() * 14);
-      const h = 5 + Math.random() * 13;
-      const w = 1.4 + Math.random() * 2.4;
-      const d = 1.6 + Math.random() * 2.8;
+      const x = -38 + i * 2.8 + (Math.random() - .5) * 1.2;
+      const z = side * (42 + Math.random() * 12);
+      const h = 3.2 + Math.random() * 6.8;
+      const w = .9 + Math.random() * 1.45;
+      const d = .9 + Math.random() * 1.5;
       const material = new THREE.MeshStandardMaterial({
         color:matColors[i % matColors.length],
-        roughness:.58,
-        metalness:.22,
+        roughness:.64,
+        metalness:.16,
         map:createWindowTexture(i % 3 === 0 ? '#4eb7c7' : '#d9e2eb', i + 20),
         emissive:new THREE.Color(i % 5 === 0 ? 0xb82935 : 0x4eb7c7),
-        emissiveIntensity:.018
+        emissiveIntensity:.007
       });
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
       mesh.position.set(x, h / 2, z);
-      mesh.castShadow = true;
+      mesh.castShadow = false;
       mesh.receiveShadow = true;
       cityGroup.add(mesh);
     }
@@ -654,46 +769,103 @@
 
   function createCar(){
     const group = new THREE.Group();
-    const blackMetal = new THREE.MeshStandardMaterial({color:0x07080a, metalness:.8, roughness:.24});
-    const chrome = new THREE.MeshStandardMaterial({color:0xd9e2eb, metalness:.92, roughness:.18});
-    const glass = new THREE.MeshStandardMaterial({color:0x172330, metalness:.25, roughness:.08, transparent:true, opacity:.78});
+    const bodyMat = new THREE.MeshStandardMaterial({color:0x090a0d, metalness:.72, roughness:.22});
+    const accentMat = new THREE.MeshStandardMaterial({color:0x161b20, metalness:.62, roughness:.2});
+    const chrome = new THREE.MeshStandardMaterial({color:0xd9e2eb, metalness:.96, roughness:.14});
+    const glass = new THREE.MeshStandardMaterial({color:0x172330, metalness:.18, roughness:.05, transparent:true, opacity:.68});
     const red = new THREE.MeshBasicMaterial({color:0xb82935});
     const light = new THREE.MeshBasicMaterial({color:0xf4e4b8});
 
-    const body = new THREE.Mesh(new THREE.BoxGeometry(2.8, .52, 1.22), blackMetal);
-    body.position.y = .42;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(3.45, .46, 1.18), bodyMat);
+    body.position.y = .45;
     body.castShadow = true;
     group.add(body);
 
-    const hood = new THREE.Mesh(new THREE.BoxGeometry(1.05, .12, 1.28), chrome);
-    hood.position.set(.58, .74, 0);
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(1.18, .24, 1.1), bodyMat);
+    nose.position.set(1.02, .65, 0);
+    nose.castShadow = true;
+    group.add(nose);
+
+    const rearDeck = new THREE.Mesh(new THREE.BoxGeometry(.92, .2, 1.04), bodyMat);
+    rearDeck.position.set(-1.12, .66, 0);
+    rearDeck.castShadow = true;
+    group.add(rearDeck);
+
+    const hood = new THREE.Mesh(new THREE.BoxGeometry(1.16, .055, 1.05), chrome);
+    hood.position.set(.8, .81, 0);
     hood.castShadow = true;
     group.add(hood);
 
-    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.1, .54, .9), glass);
-    cabin.position.set(-.36, .88, 0);
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(.92, .18, .82), bodyMat);
+    roof.position.set(-.3, 1.12, 0);
+    roof.castShadow = true;
+    group.add(roof);
+
+    const windshield = new THREE.Mesh(new THREE.BoxGeometry(.12, .48, .74), glass);
+    windshield.position.set(.18, .96, 0);
+    windshield.rotation.z = -.18;
+    windshield.castShadow = true;
+    group.add(windshield);
+
+    const rearGlass = new THREE.Mesh(new THREE.BoxGeometry(.12, .44, .72), glass);
+    rearGlass.position.set(-.78, .96, 0);
+    rearGlass.rotation.z = .2;
+    rearGlass.castShadow = true;
+    group.add(rearGlass);
+
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(.78, .52, .78), glass);
+    cabin.position.set(-.3, .92, 0);
     cabin.castShadow = true;
     group.add(cabin);
 
-    const tail = new THREE.Mesh(new THREE.BoxGeometry(.18, .15, .92), red);
-    tail.position.set(-1.48, .47, 0);
-    group.add(tail);
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(3.56, .045, .08), chrome);
+    stripe.position.set(0, .72, -.62);
+    const stripeRight = stripe.clone();
+    stripeRight.position.z = .62;
+    group.add(stripe, stripeRight);
 
-    const headLeft = new THREE.Mesh(new THREE.BoxGeometry(.12, .12, .25), light);
-    headLeft.position.set(1.47, .5, -.33);
-    const headRight = headLeft.clone();
-    headRight.position.z = .33;
-    group.add(headLeft, headRight);
+    const bumperFront = new THREE.Mesh(new THREE.BoxGeometry(.12, .14, 1.16), chrome);
+    bumperFront.position.set(1.8, .42, 0);
+    const bumperRear = bumperFront.clone();
+    bumperRear.position.x = -1.8;
+    group.add(bumperFront, bumperRear);
+
+    const fenderGeo = new THREE.SphereGeometry(.38, 24, 12);
+    [[-1.05,-.66],[1.05,-.66],[-1.05,.66],[1.05,.66]].forEach(([x,z]) => {
+      const fender = new THREE.Mesh(fenderGeo, accentMat);
+      fender.scale.set(1.28, .42, .62);
+      fender.position.set(x, .47, z);
+      fender.castShadow = true;
+      group.add(fender);
+    });
+
+    [-.36,.36].forEach((z) => {
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(.08, .13, .22), red);
+      tail.position.set(-1.86, .52, z);
+      group.add(tail);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(.12, 16, 10), light);
+      head.scale.set(1, .78, 1);
+      head.position.set(1.86, .57, z);
+      group.add(head);
+    });
 
     const wheelMat = new THREE.MeshStandardMaterial({color:0x040506, metalness:.5, roughness:.4});
-    const wheelGeo = new THREE.CylinderGeometry(.27, .27, .24, 24);
-    [[-.9,-.66],[.9,-.66],[-.9,.66],[.9,.66]].forEach(([x,z]) => {
+    const rimMat = new THREE.MeshStandardMaterial({color:0xd9e2eb, metalness:.9, roughness:.16});
+    const wheelGeo = new THREE.CylinderGeometry(.31, .31, .25, 28);
+    const rimGeo = new THREE.TorusGeometry(.19, .025, 8, 28);
+    [[-1.05,-.66],[1.05,-.66],[-1.05,.66],[1.05,.66]].forEach(([x,z]) => {
       const wheel = new THREE.Mesh(wheelGeo, wheelMat);
       wheel.rotation.x = Math.PI / 2;
-      wheel.position.set(x, .2, z);
+      wheel.position.set(x, .23, z);
       wheel.castShadow = true;
       wheels.push(wheel);
       group.add(wheel);
+
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.rotation.x = Math.PI / 2;
+      rim.position.set(x, .23, z > 0 ? z + .13 : z - .13);
+      group.add(rim);
     });
 
     const coneMat = new THREE.MeshBasicMaterial({color:0xf4e4b8, transparent:true, opacity:.16, depthWrite:false});
@@ -753,10 +925,10 @@
     buildingGroups.forEach((group, key) => {
       group.traverse((obj) => {
         if(obj.material && obj.material.emissiveIntensity !== undefined){
-          obj.material.emissiveIntensity = key === id ? .11 : .025;
+          obj.material.emissiveIntensity = key === id ? .14 : .022;
         }
       });
-      group.scale.setScalar(key === id ? 1.035 : 1);
+      group.scale.setScalar(key === id ? 1.055 : 1);
     });
   }
 
@@ -795,13 +967,13 @@
     const side = stop.building.z < 0 ? 1 : -1;
     const mobile = window.innerWidth < 720;
     const desired = new THREE.Vector3(
-      stop.road.x + (mobile ? 0 : side * 2.4),
-      mobile ? 11.5 : 9.6,
-      side * (mobile ? 25 : 20)
+      stop.road.x + (mobile ? 0 : side * 1.2),
+      mobile ? 9.4 : 7.2,
+      side * (mobile ? 17.5 : 13.6)
     );
-    camera.position.lerp(desired, .045);
-    const desiredLook = new THREE.Vector3(stop.building.x, mobile ? 4.5 : 4.2, stop.building.z * .55);
-    lookTarget.lerp(desiredLook, .08);
+    camera.position.lerp(desired, .055);
+    const desiredLook = new THREE.Vector3(stop.building.x, mobile ? 4.2 : 4.6, stop.building.z * .72);
+    lookTarget.lerp(desiredLook, .1);
     camera.lookAt(lookTarget);
   }
 
