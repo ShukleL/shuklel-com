@@ -9,7 +9,7 @@
     {
       id:'accueil', label:'Accueil', short:'Shuklel', kicker:'Montréal nocturne', title:'Shuklel',
       description:'Artiste, producteur et rappeur basé à Montréal, Shuklel fusionne rap, afro-beat et synthwave. Plus de 150 000 écoutes et 5 000 abonnés soutiennent déjà son parcours.',
-      poster:'images/Logo Mystique.png', mediaClass:'logo-fit', accent:0xd9e2eb, light:'#d9e2eb',
+      poster:'assets/city/logo.webp', mediaClass:'logo-fit', accent:0xd9e2eb, light:'#d9e2eb',
       road:{x:-24,z:0}, building:{x:-24,z:-9,w:4.2,h:9.4,d:4.2},
       actions:[
         {kind:'link', label:'YouTube', href:'https://www.youtube.com/@shuklel'},
@@ -31,7 +31,7 @@
     {
       id:'music', label:'Musique', short:'Music', kicker:'Catalogue', title:'Discographie',
       description:'Les projets Shuklel réunis comme des affiches sur la skyline : chaque façade ouvre vers un album, un univers ou une époque.',
-      poster:'images/SHUKLEL RIGIDE ET SCRUPULEUX COVER OFFICIELLE.png', accent:0x4eb7c7, light:'#4eb7c7',
+      poster:'assets/city/rigide.webp', accent:0x4eb7c7, light:'#4eb7c7',
       road:{x:-8,z:0}, building:{x:-8,z:-9,w:4.4,h:11.2,d:4.2},
       type:'music'
     },
@@ -45,21 +45,21 @@
     {
       id:'merch', label:'Vêtements', short:'Merch', kicker:'Boutique', title:'Vêtements Shuklel',
       description:'Hoodie et t-shirt dans l’esthétique sombre du projet, accessibles directement depuis le quartier merch.',
-      poster:'images/hoodie 1.png', accent:0x72b77b, light:'#72b77b',
+      poster:'assets/city/hoodie-1.webp', accent:0x72b77b, light:'#72b77b',
       road:{x:8,z:0}, building:{x:8,z:-9,w:5,h:11.9,d:4.6},
       type:'merch'
     },
     {
       id:'cart', label:'Panier', short:'Panier', kicker:'Commande', title:'Panier',
       description:'Les articles ajoutés restent disponibles pendant la visite.',
-      poster:'images/Logo Mystique.png', accent:0xf0b64d, light:'#f0b64d',
+      poster:'assets/city/logo.webp', accent:0xf0b64d, light:'#f0b64d',
       road:{x:16,z:0}, building:{x:16,z:9,w:4.2,h:9.7,d:4},
       type:'cart'
     },
     {
       id:'contact', label:'Contact', short:'Contact', kicker:'Réseaux', title:'Contact & Réseaux',
       description:'Booking, questions, précommande ou collaboration : le bureau reste ouvert au bout de la route.',
-      poster:'images/Logo Mystique.png', accent:0xd9e2eb, light:'#d9e2eb',
+      poster:'assets/city/logo.webp', accent:0xd9e2eb, light:'#d9e2eb',
       road:{x:24,z:0}, building:{x:24,z:-9,w:4.6,h:10.8,d:4.4},
       type:'contact'
     }
@@ -67,16 +67,16 @@
 
   const albums = [
     {title:'Rigide et Scrupuleux Vol.2', meta:'Projet mis en avant', image:'assets/cover.webp', href:'https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux'},
-    {title:'Rigide et scrupuleux', meta:'2025', image:'images/SHUKLEL RIGIDE ET SCRUPULEUX COVER OFFICIELLE.png', href:'https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux'},
-    {title:'The Chronics', meta:'2024', image:'images/COVER SHUKLEL CHRONICS.jpeg', href:'https://distrokid.com/hyperfollow/shuklel/chronics'},
-    {title:'Nightmares 3', meta:'2023', image:'images/NGHTMARES 3 OFFICIAL COVER.jpg', href:'https://distrokid.com/hyperfollow/shuklel/nightmares-3--paradoxical-sleep'},
-    {title:'Nightmares 2', meta:'2022', image:'images/nightmares 2 cover (2).png', href:'https://music.apple.com/ng/album/nightmares-2-lucid-dreams/1757700981'},
-    {title:'Nightmares 1', meta:'2021', image:'images/nightmares  cover.png', href:'https://www.youtube.com/watch?v=5tFkm6VHHkc&list=PLm2uy-m9rn8iYt26hr6-FGiCrykDRUm--&index=7'}
+    {title:'Rigide et scrupuleux', meta:'2025', image:'assets/city/rigide.webp', href:'https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux'},
+    {title:'The Chronics', meta:'2024', image:'assets/city/chronics.webp', href:'https://distrokid.com/hyperfollow/shuklel/chronics'},
+    {title:'Nightmares 3', meta:'2023', image:'assets/city/nightmares-3.webp', href:'https://distrokid.com/hyperfollow/shuklel/nightmares-3--paradoxical-sleep'},
+    {title:'Nightmares 2', meta:'2022', image:'assets/city/nightmares-2.webp', href:'https://music.apple.com/ng/album/nightmares-2-lucid-dreams/1757700981'},
+    {title:'Nightmares 1', meta:'2021', image:'assets/city/nightmares-1.webp', href:'https://www.youtube.com/watch?v=5tFkm6VHHkc&list=PLm2uy-m9rn8iYt26hr6-FGiCrykDRUm--&index=7'}
   ];
 
   const products = [
-    {id:'hoodie', title:'Hoodie Shuklel', price:60, image:'images/hoodie 1.png', gallery:['images/hoodie 1.png','images/hoodie 2.png','images/hoodie 3.png','images/hoodie 4.png']},
-    {id:'tshirt', title:'T-shirt Shuklel', price:35, image:'images/t shirt 1.png', gallery:['images/t shirt 1.png','images/tshirt 2.png','images/tshirt 3.png','images/tshirt 4.png']}
+    {id:'hoodie', title:'Hoodie Shuklel', price:60, image:'assets/city/hoodie-1.webp', gallery:['assets/city/hoodie-1.webp','assets/city/hoodie-2.webp','assets/city/hoodie-3.webp','assets/city/hoodie-4.webp']},
+    {id:'tshirt', title:'T-shirt Shuklel', price:35, image:'assets/city/tee-1.webp', gallery:['assets/city/tee-1.webp','assets/city/tee-2.webp','assets/city/tee-3.webp','assets/city/tee-4.webp']}
   ];
 
   const byId = Object.fromEntries(stops.map((stop) => [stop.id, stop]));
@@ -221,7 +221,7 @@
           <input class="field" type="email" id="secretMail" name="email" placeholder="Votre email" required />
           <button class="action" type="submit">Valider</button>
         </form>
-        <a class="action secret-download" id="secretDownload" href="${localAsset('images/De la méthode Rigide et scrupuleuse - ShukleL.pdf')}" download>Télécharger le livre</a>
+        <a class="action secret-download" id="secretDownload" href="${localAsset('assets/city/book.pdf')}" download>Télécharger le livre</a>
       </div>
     `;
   }
@@ -376,7 +376,7 @@
   function setupThree(){
     const mount = document.getElementById('cityCanvas');
     if(!window.THREE){
-      mount.innerHTML = `<div class="fallback"><div class="fallback-inner"><img src="${localAsset('images/Logo Mystique.png')}" alt="Logo Shuklel" /><h1>Shuklel</h1><p>La ville 3D n'a pas pu charger.</p></div></div>`;
+      mount.innerHTML = `<div class="fallback"><div class="fallback-inner"><img src="${localAsset('assets/city/logo.webp')}" alt="Logo Shuklel" /><h1>Shuklel</h1><p>La ville 3D n'a pas pu charger.</p></div></div>`;
       return;
     }
 
