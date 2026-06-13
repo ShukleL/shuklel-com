@@ -1,386 +1,57 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-
-<!-- Start cookieyes banner --> <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/adc6fedfa7ff9d4727514241/script.js"></script> <!-- End cookieyes banner -->
-
+  <!-- Start cookieyes banner -->
+  <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/adc6fedfa7ff9d4727514241/script.js"></script>
+  <!-- End cookieyes banner -->
 
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="google-adsense-account" content="ca-pub-7557967332874436">
-  <title> ShukleL – Site Officiel</title>
+  <meta name="google-adsense-account" content="ca-pub-7557967332874436" />
+  <meta name="description" content="Shuklel, artiste, producteur et rappeur basé à Montréal. Une ville 3D nocturne pour explorer musique, livre, vêtements et contact." />
+  <title>Shuklel</title>
 
-  <!-- Google Analytics (GA4) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JN1F305PY7"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-JN1F305PY7');
-  </script>
-
-  <!-- ------------------   PRELOAD (background + ressources critiques)   ------------------ -->
-  <link rel="preload" as="image" href="images/9e4d3e1d-c7d2-4eb6-b02d-452064e176e4TPZ.png" />
+  <link rel="preload" as="image" href="assets/background-rs2.png" />
+  <link rel="preload" as="image" href="assets/cover.webp" />
   <link rel="preload" as="image" href="images/Logo Mystique.png" />
-  <link rel="preload" as="image" href="images/SHUKLEL RIGIDE ET SCRUPULEUX COVER OFFICIELLE.png" />
-  <link rel="preload" as="image" href="images/ChatGPT Image 26 mars 2025, 08_56_25.png" />
-  <link rel="preload" as="image" href="images/download.jpg" />
-
-  <!-- Favicon : une seule pique (32 × 32 px) -->
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon.png" />
-  
-<link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/city-3d.css" />
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-
-
-  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7557967332874436"
-     crossorigin="anonymous"></script>
-
-  <style>
-    /* ========== RESET & BASE =========*/
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:"Montserrat",sans-serif;color:#eee;line-height:1.6;background:#111;min-height:100vh;position:relative;overflow-x:hidden}
-    body::before{content:"";position:fixed;inset:0;background:url("images/9e4d3e1d-c7d2-4eb6-b02d-452064e176e4TPZ.png") center/cover no-repeat;filter:blur(5px) brightness(.7);z-index:-1}
-    a{color:#0d6efd;text-decoration:none}
-
-    /* ========== NAVBAR =========*/
-    nav{position:fixed;top:0;left:0;width:100%;padding:10px 20px;background:rgba(0,0,0,.9);display:flex;justify-content:space-between;align-items:center;z-index:1000}
-    nav .logo img{height:40px}
-    .burger{display:none;font-size:1.7rem;color:#fff;cursor:pointer}
-    nav ul{list-style:none;display:flex;gap:22px;align-items:center;transition:transform .3s ease}
-    nav li{display:flex;align-items:center;gap:6px;font-weight:700;text-transform:uppercase;font-size:.9em;color:#fff;position:relative}
-    nav li a{color:#fff}
-    .cart-count{position:absolute;top:-10px;right:-14px;background:#0d6efd;border-radius:50%;padding:2px 6px;font-size:.75em;display:none}
-
-    .spacer{height:64px}
-
-    /* ========== SECTIONS =========*/
-    section{padding:90px 20px;max-width:1200px;margin:auto;text-align:center}
-    .section-title{font-family:"Cinzel",serif;font-size:2.55em;margin-bottom:22px}
-    .bio{max-width:800px;margin:auto}
-
-    /* ========== BUTTON =========*/
-    .btn{display:inline-block;background:#0d6efd;color:#fff;padding:10px 18px;border-radius:4px;font-weight:700;margin:6px 4px;cursor:pointer;transition:background .25s}
-    .btn:hover{background:#0a53be}
-
-    /* ========== CARDS =========*/
-    .card-container{display:flex;flex-wrap:wrap;gap:22px;justify-content:center}
-    .card{background:#222;border-radius:8px;overflow:hidden;width:280px;box-shadow:0 4px 8px rgba(0,0,0,.35)}
-    .card img{width:100%;display:block}
-    .card-content{padding:17px}
-    .card-content h3{font-family:"Cinzel",serif;margin-bottom:8px}
-   
-    /* === VIDEO === */
-    .video-container{aspect-ratio:16/9;width:95%;max-width:1000px;margin:0 auto;overflow:hidden;border-radius:8px}
-    .video-container iframe{width:100%;height:100%}
-
-
-    /* ========== SLIDER (merch) =========*/
-    .slider{position:relative;cursor:pointer}
-    .slider img{width:100%;display:none}
-    .slider img.active{display:block}
-    .slider-controls{position:absolute;top:50%;left:0;right:0;display:flex;justify-content:space-between;pointer-events:none;transform:translateY(-50%)}
-    .slider-controls button{pointer-events:all;background:rgba(0,0,0,.5);color:#fff;border:none;padding:6px 10px;cursor:pointer}
-
-    /* ========== RESPONSIVE =========*/
-    @media(max-width:768px){
-      .burger{display:block}
-      nav ul{position:absolute;top:64px;left:0;right:0;background:rgba(0,0,0,.92);flex-direction:column;gap:18px;padding:22px;transform:translateY(-220%)}
-      nav.open ul{transform:translateY(0)}
-      .card-container{flex-direction:column;align-items:center}
-      section{padding:70px 20px}
-    }
-  </style>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="https://www.paypal.com/sdk/js?client-id=AUESTSxCQgivh4N5isRmQmLi83WZzOiM2S_UK8ljUopiYrkaj3rSQKDA3oFx7aN7Qh1jT4yhqB2m8Z9z&currency=USD"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7557967332874436" crossorigin="anonymous"></script>
+  <script defer src="js/city-3d.js"></script>
 </head>
-<!-- === PayPal SDK & Boutons === -->
-<script src="https://www.paypal.com/sdk/js?client-id=AUESTSxCQgivh4N5isRmQmLi83WZzOiM2S_UK8ljUopiYrkaj3rSQKDA3oFx7aN7Qh1jT4yhqB2m8Z9z&currency=USD"></script>
-
-
 <body>
-  <!-- ========== NAVBAR ========== -->
-  <nav>
-    <div class="logo"><img src="images/Logo Mystique.png" alt="Logo Shuklel" loading="lazy"></div>
-    <div class="burger" onclick="toggleNav()">&#9776;</div>
-    <ul>
-      <li>🏠 <a href="#accueil">Accueil</a></li>
-      <li>🔥 <a href="#album">Album</a></li>
-      <li>📖 <a href="#book">Livre</a></li>
-      <li>🎵 <a href="#music">Musique</a></li>
-      <li>👕 <a href="#merch">Vêtements</a></li>
-      <li class="cart-icon">🛒 <a href="#cart">Panier</a><span id="cart-count" class="cart-count">0</span></li>
-      <li>📞 <a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
-  <div class="spacer"></div>
+  <main class="city-experience" id="cityExperience">
+    <div class="city-canvas" id="cityCanvas" aria-hidden="true"></div>
 
-  <!-- ========== ACCUEIL ========== -->
-   <section id="accueil">
-    <h1 class="section-title">Shuklel</h1>
-    <p style="max-width:800px;margin:0 auto 20px;text-align:center">Artiste, producteur et rappeur basé à Montréal, Shuklel fusionne rap, afro‑beat et synthwave. Plus de 150 000 écoutes et 5 000 abonnés soutiennent déjà son parcours.</p>
-    <div style="text-align:center">
-      <a class="btn" href="https://www.youtube.com/@shuklel" target="_blank">YouTube</a>
-      <a class="btn" href="https://www.instagram.com/ultimate_dini/" target="_blank">Instagram</a>
-      <a class="btn" href="mailto:shukfit@gmail.com">Contact</a>
-    </div>
-  </section>
+    <header class="topbar">
+      <a class="brand" href="#accueil" data-go="accueil" aria-label="Shuklel accueil">
+        <img src="images/Logo Mystique.png" alt="Logo Shuklel" />
+        <span>Shuklel</span>
+      </a>
+      <nav class="nav-rail" id="navRail" aria-label="Navigation principale"></nav>
+      <button class="cart-button" type="button" data-go="cart">Panier <span class="cart-badge" id="cartCountBadge">0</span></button>
+    </header>
 
- <!-- ===== BLUE DEEP V1 ===== -->
-  <section id="blue-deep">
-    <h2 class="section-title">Blue Deep V1 (Album)</h2>
-    <div class="video-container">
-      <iframe src="https://www.youtube.com/embed/Z6Js33oNScA" title="Blue Deep V1" frameborder="0" allowfullscreen></iframe>
-    </div>
-  </section>
+    <aside class="story-panel" id="storyPanel" aria-live="polite"></aside>
+    <div class="route-dock" id="routeDock" aria-label="Trajet"></div>
+    <footer>© 2026 Shuklel - Tous droits réservés.</footer>
+    <div class="scene-credit">Rigide et Scrupuleux Vol.2</div>
+  </main>
 
-  <!-- ==== Musique ==== -->
-  <section id="music">
-    <h2 class="section-title">Discographie</h2>
-    <div class="card-container">
-      <!-- Rigide & Scrupuleux -->
-      <div class="card"><img src="images/SHUKLEL RIGIDE ET SCRUPULEUX COVER OFFICIELLE.png" alt="Rigide & Scrupuleux" loading="lazy"><div class="card-content"><h3>Rigide et scrupuleux</h3><p>2025</p><a class="btn" href="https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux" target="_blank">Écouter</a></div></div>
-      <!-- The Chronics -->
-      <div class="card"><img src="images/COVER SHUKLEL CHRONICS.jpeg" alt="The Chronics" loading="lazy"><div class="card-content"><h3>The Chronics</h3><p>2024</p><a class="btn" href="https://distrokid.com/hyperfollow/shuklel/chronics" target="_blank">Écouter</a></div></div>
-      <!-- Nightmares 3 -->
-      <div class="card"><img src="images/NGHTMARES 3 OFFICIAL COVER.jpg" alt="Nightmares 3" loading="lazy"><div class="card-content"><h3>Nightmares 3</h3><p>2023</p><a class="btn" href="https://distrokid.com/hyperfollow/shuklel/nightmares-3--paradoxical-sleep" target="_blank">Écouter</a></div></div>
-      <!-- Nightmares 2 -->
-      <div class="card"><img src="images/nightmares 2 cover (2).png" alt="Nightmares 2" loading="lazy"><div class="card-content"><h3>Nightmares 2</h3><p>2022</p><a class="btn" href="https://music.apple.com/ng/album/nightmares-2-lucid-dreams/1757700981" target="_blank">Écouter</a></div></div>
-      <!-- Nightmares 1 -->
-      <div class="card"><img src="images/nightmares  cover.png" alt="Nightmares 1" loading="lazy"><div class="card-content"><h3>Nightmares 1</h3><p>2021</p><a class="btn" href="https://www.youtube.com/watch?v=5tFkm6VHHkc&list=PLm2uy-m9rn8iYt26hr6-FGiCrykDRUm--&index=7" target="_blank">Écouter</a></div></div>
-    </div>
-  </section>
-
-  <!-- ========== LIVRE ========== -->
-<section id="book">
-  <h2 class="section-title">Livre : De la méthode rigide et scrupuleuse</h2>
-
-  <div style="display:flex;justify-content:center">
-    <div class="card" style="max-width:300px">
-      <img src="images/ChatGPT Image 26 mars 2025, 08_56_25.png" alt="Livre" loading="lazy">
-      <div class="card-content">
-        <h3>De la méthode rigide et scrupuleuse</h3>
-        <p><strong>Prix : 5 $</strong></p>
-
-        <!-- BOUTONS -->
-        <button class="btn"
-                onclick="immediatePurchase('Livre – De la méthode',5,'paypal-zone-book')">
-          Acheter
-        </button>
-
-        <button class="btn"
-                onclick="addToCart('Livre – De la méthode',5)">
-          Ajouter au panier
-        </button>
-
-        <button class="btn" onclick="toggleSecret()">Code secret</button>
-
-        <!-- PayPal (caché au départ) -->
-        <div id="paypal-zone-book" style="display:none;margin-top:12px"></div>
-
-        <!-- Zone code secret -->
-        <div id="secret-zone" style="display:none;margin-top:15px;text-align:left">
-          <form id="secret-form" action="https://formspree.io/f/xldjpwzz" method="POST">
-            <input type="hidden" name="_subject" value="Accès livre gratuit">
-            <input type="text"   id="secret-code" name="code"  placeholder="Code secret" required>
-            <input type="email"  id="secret-mail" name="email" placeholder="Votre email" required>
-            <button type="submit" class="btn" style="width:100%">Valider</button>
-          </form>
-          <a id="secret-dl" class="btn"
-             href="images/De la méthode Rigide et scrupuleuse - ShukleL.pdf"
-             download style="display:none;width:100%;margin-top:10px">
-             Télécharger le livre
-          </a>
-        </div>
+  <noscript>
+    <section class="fallback">
+      <div class="fallback-inner">
+        <img src="images/Logo Mystique.png" alt="Logo Shuklel" />
+        <h1>Shuklel</h1>
+        <p>Active JavaScript pour ouvrir la ville interactive.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-  <!-- ========== Vêtements ========= -->
-<section id="merch">
-  <h2 class="section-title">Vêtements</h2>
-  <div class="card-container">
-  <!-- Hoodie -->
-  <div class="card">
-    <div class="slider" id="hoodie-slider" ondblclick="openViewer('hoodie')">
-      <img src="images/hoodie 1.png"  class="active" alt="hoodie1" loading="lazy">
-      <img src="images/hoodie 2.png" alt="hoodie2" loading="lazy">
-      <img src="images/hoodie 3.png" alt="hoodie3" loading="lazy">
-      <img src="images/hoodie 4.png" alt="hoodie4" loading="lazy">
-      <div class="slider-controls">
-        <button onclick="prevSlide('hoodie')">&#9664;</button>
-        <button onclick="nextSlide('hoodie')">&#9654;</button>
-      </div>
-    </div>
-
-    <div class="card-content">
-      <h3>Hoodie Shuklel</h3><p>60 $</p>
-
-      <button class="btn"
-              onclick="immediatePurchase('Hoodie Shuklel',60,'paypal-zone-hoodie')">
-        Acheter
-      </button>
-
-      <button class="btn"
-              onclick="addToCart('Hoodie Shuklel',60)">
-        Ajouter au panier
-      </button>
-
-      <div id="paypal-zone-hoodie" style="display:none;margin-top:12px"></div>
-    </div>
-  </div>
-
-  <!-- T‑shirt -->
-  <div class="card">
-    <div class="slider" id="tee-slider" ondblclick="openViewer('tee')">
-      <img src="images/t shirt 1.png" class="active" alt="tee1" loading="lazy">
-      <img src="images/tshirt 2.png" alt="tee2" loading="lazy">
-      <img src="images/tshirt 3.png" alt="tee3" loading="lazy">
-      <img src="images/tshirt 4.png" alt="tee4" loading="lazy">
-      <div class="slider-controls">
-        <button onclick="prevSlide('tee')">&#9664;</button>
-        <button onclick="nextSlide('tee')">&#9654;</button>
-      </div>
-    </div>
-
-    <div class="card-content">
-      <h3>T‑shirt Shuklel</h3><p>35 $</p>
-
-      <button class="btn"
-              onclick="immediatePurchase('T‑shirt Shuklel',35,'paypal-zone-tshirt')">
-        Acheter
-      </button>
-
-      <button class="btn"
-              onclick="addToCart('T‑shirt Shuklel',35)">
-        Ajouter au panier
-      </button>
-
-      <div id="paypal-zone-tshirt" style="display:none;margin-top:12px"></div>
-    </div>
-  </div>
-</div>
-
-
-  <!-- ========== PANIER ========= -->
-  <section id="cart">
-    <h2 class="section-title">Panier</h2>
-    <div style="max-width:500px;margin:auto;background:#222;padding:22px;border-radius:8px;text-align:left">
-      <h3 style="font-family:'Cinzel',serif;margin-bottom:10px">Articles :</h3>
-      <ul id="cart-items"></ul>
-      <p id="cart-total">Total : 0 $</p>
-      <button class="btn" id="checkout-btn" onclick="checkout()">Paiement</button>
-
-    </div>
-  </section>
-
-  <!-- ========== CONTACT ========= -->
-  <section id="contact">
-    <h2 class="section-title">Contact & Réseaux</h2>
-    <p>Pour toute question :<a href="#" id="contact-email"></a>
-</p>
-    <div style="margin-top:20px"><a class="btn" href="https://www.youtube.com/@shuklel" target="_blank">YouTube</a><a class="btn" href="https://www.instagram.com/ultimate_dini/" target="_blank">Instagram</a></div>
-    <div style="margin-top:28px"><img src="images/Logo Mystique.png" alt="Logo" style="max-width:100px" loading="lazy"></div>
-  </section>
-
-  <footer style="text-align:center;padding:24px 0">© 2025 Shuklel – Tous droits réservés.</footer>
-
-  <!-- ========== ADSENSE ========= -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js?client=ca-pub-7557967332874436" crossorigin="anonymous"></script>
-
-  <!-- ========== SCRIPTS ========= -->
-  <script>
-    /* NAV */
-    const nav=document.querySelector('nav');function toggleNav(){nav.classList.toggle('open')}
-
-    /* CART */
-    const cart=[];const cnt=document.getElementById('cart-count');function refreshCart(){const list=document.getElementById('cart-items');list.innerHTML='';let total=0;cart.forEach(i=>{const li=document.createElement('li');li.textContent=`${i.product} – ${i.price} $`;list.appendChild(li);total+=i.price});document.getElementById('cart-total').textContent=`Total : ${total} $`;cnt.style.display=cart.length?'inline-block':'none';cnt.textContent=cart.length}
-    function addToCart(p,pr){cart.push({product:p,price:pr});refreshCart();alert(`${p} ajouté au panier.`)}
-
-    /* PAYPAL checkout simple */
-    function checkout(){
-  if (!cart.length) {
-    alert('Panier vide');
-    return;
-  }
-
-  const total = cart.reduce((s, i) => s + i.price, 0).toFixed(2);
-
-  paypal.Buttons({
-    createOrder: (_, a) => a.order.create({
-      purchase_units: [{ amount: { value: total } }]
-    }),
-    onApprove: (_, a) => a.order.capture().then(d => {
-      sendPurchaseEmail("Commande Panier", total); // ✅ Appel du mail ici
-      alert(`Merci ${d.payer.name.given_name} ! Paiement OK.`);
-      cart.length = 0;
-      refreshCart();
-      document.getElementById('checkout-btn').innerHTML = 'Paiement';
-    })
-  }).render('#checkout-btn');
-
-  document.getElementById('checkout-btn').innerHTML = '';
-
-}
-
-/* ACHAT DIRECT – affiche le widget PayPal seulement après le clic */
-function immediatePurchase(item, price, zoneId){
-  const zone = document.getElementById(zoneId);
-  if (zone.dataset.rendered) return;      // évite plusieurs rendus
-  zone.style.display = 'block';
-
-  paypal.Buttons({
-    createOrder: (_, actions) => actions.order.create({
-      purchase_units: [{
-        description: item,
-        amount: { value: price.toFixed(2) }
-      }]
-    }),
-  onApprove: (_, actions) => actions.order.capture().then(d => {
-  alert('Merci ' + d.payer.name.given_name + ' ! Paiement confirmé.');
-  sendPurchaseEmail(item, price); // ✅ Envoie l’email automatiquement
-})
-
-  }).render('#' + zoneId);
-
-  zone.dataset.rendered = '1';
-}
-
-function sendPurchaseEmail(product, price) {
-  fetch("https://formspree.io/f/xldjpwzz", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      _subject: "Achat sur le site Shuklel",
-      message: `Produit : ${product}\nMontant : ${price} $`,
-      email: "shukfit@gmail.com"
-    })
-  });
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const email = "shukfit" + "@" + "gmail.com";
-  const link = document.getElementById("contact-email");
-  link.href = "mailto:" + email;
-  link.textContent = email;
-});
-
-
-    /* SECRET CODE */
-    function toggleSecret(){document.getElementById('secret-zone').style.display='block'}
-    document.getElementById('secret-form').addEventListener('submit',e=>{e.preventDefault();if(document.getElementById('secret-code').value==='500ANS'){document.getElementById('secret-dl').style.display='inline-block';document.getElementById('secret-form').style.display='none'}else{alert('Code incorrect, réessayez.')}});
-
-    /* SLIDERS */
-    const sliders={hoodie:[...document.querySelectorAll('#hoodie-slider img')],tee:[...document.querySelectorAll('#tee-slider img')]},idx={hoodie:0,tee:0};function show(type){sliders[type].forEach((img,i)=>img.classList.toggle('active',i===idx[type]))}
-    function nextSlide(t){idx[t]=(idx[t]+1)%sliders[t].length;show(t)}function prevSlide(t){idx[t]=(idx[t]-1+sliders[t].length)%sliders[t].length;show(t)}
-
-    /* MODAL VIEWER images merch (optionnel) */
-    function openViewer(t){const imgs=sliders[t].map(i=>i.src);let i=0;const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:2000';m.onclick=e=>{if(e.target===m)m.remove()};m.innerHTML=`<img src="${imgs[0]}" style="max-width:90%;max-height:90%">`;
-      document.body.appendChild(m);m.onkeydown=e=>{if(e.key==='ArrowRight'){i=(i+1)%imgs.length}else if(e.key==='ArrowLeft'){i=(i-1+imgs.length)%imgs.length}else if(e.key==='Escape'){m.remove();}m.querySelector('img').src=imgs[i]};m.focus()}
-  </script>
+    </section>
+  </noscript>
 </body>
 </html>
