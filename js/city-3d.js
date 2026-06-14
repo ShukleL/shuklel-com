@@ -10,7 +10,7 @@
       id:'accueil', label:'Accueil', short:'Shuklel', kicker:'Montréal nocturne', title:'Shuklel',
       description:'Artiste, producteur et rappeur basé à Montréal, Shuklel fusionne rap, afro-beat et synthwave. Plus de 150 000 écoutes et 5 000 abonnés soutiennent déjà son parcours.',
       poster:'assets/city/logo.webp', mediaClass:'logo-fit', accent:0xd9e2eb, light:'#d9e2eb',
-      road:{x:-24,z:0}, building:{x:-24,z:-6.35,w:7.2,h:8.8,d:3.0},
+      road:{x:-20,z:0}, building:{x:-20,z:-6.35,w:7.5,h:8.8,d:3.0},
       actions:[
         {kind:'link', label:'YouTube', href:'https://www.youtube.com/@shuklel'},
         {kind:'link', label:'Instagram', href:'https://www.instagram.com/ultimate_dini/'},
@@ -21,46 +21,39 @@
       id:'album', label:'Album', short:'RS Vol.2', kicker:'Projet mis en avant', title:'Rigide et Scrupuleux Vol.2',
       description:'Une direction artistique sombre, premium et urbaine : chrome, nuit, ville et tension cinématique autour du nouveau projet.',
       poster:'assets/cover.webp', accent:0xd6ae72, light:'#d6ae72',
-      road:{x:-16,z:0}, building:{x:-16,z:6.35,w:8.0,h:10.8,d:3.1},
+      road:{x:-12,z:0}, building:{x:-12,z:6.35,w:8.2,h:10.8,d:3.1},
       actions:[
         {kind:'link', label:'Écouter le projet', href:'https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux'},
         {kind:'go', label:'Discographie', target:'music'},
-        {kind:'go', label:'Précommande', target:'contact'}
+        {kind:'go', label:'Contact', target:'contact'}
       ]
     },
     {
       id:'music', label:'Musique', short:'Music', kicker:'Catalogue', title:'Discographie',
       description:'Les projets Shuklel réunis comme des affiches sur la skyline : chaque façade ouvre vers un album, un univers ou une époque.',
       poster:'assets/city/rigide.webp', accent:0x4eb7c7, light:'#4eb7c7',
-      road:{x:-8,z:0}, building:{x:-8,z:-6.35,w:7.7,h:10.2,d:3.0},
+      road:{x:-4,z:0}, building:{x:-4,z:-6.35,w:8.1,h:10.2,d:3.0},
       type:'music'
-    },
-    {
-      id:'book', label:'Livre', short:'Livre', kicker:'Livre', title:'De la méthode rigide et scrupuleuse',
-      description:'Le livre prolonge l’univers du projet avec une pièce numérique à 5 $.',
-      poster:'assets/cover.webp', accent:0xb82935, light:'#b82935',
-      road:{x:0,z:0}, building:{x:0,z:6.35,w:7.5,h:9.8,d:3.0},
-      type:'book'
     },
     {
       id:'merch', label:'Vêtements', short:'Merch', kicker:'Boutique', title:'Vêtements Shuklel',
       description:'Hoodie et t-shirt dans l’esthétique sombre du projet, accessibles directement depuis le quartier merch.',
       poster:'assets/city/hoodie-1.webp', accent:0x72b77b, light:'#72b77b',
-      road:{x:8,z:0}, building:{x:8,z:-6.35,w:7.8,h:10.6,d:3.1},
-      type:'merch'
+      road:{x:4,z:0}, building:{x:4,z:6.35,w:8.2,h:10.6,d:3.1},
+      type:'merch', viewerProduct:'hoodie'
     },
     {
       id:'cart', label:'Panier', short:'Panier', kicker:'Commande', title:'Panier',
       description:'Les articles ajoutés restent disponibles pendant la visite.',
       poster:'assets/city/logo.webp', accent:0xf0b64d, light:'#f0b64d',
-      road:{x:16,z:0}, building:{x:16,z:6.35,w:7.2,h:8.9,d:3.0},
+      road:{x:12,z:0}, building:{x:12,z:-6.35,w:7.4,h:8.9,d:3.0},
       type:'cart'
     },
     {
       id:'contact', label:'Contact', short:'Contact', kicker:'Réseaux', title:'Contact & Réseaux',
       description:'Booking, questions, précommande ou collaboration : le bureau reste ouvert au bout de la route.',
       poster:'assets/city/logo.webp', accent:0xd9e2eb, light:'#d9e2eb',
-      road:{x:24,z:0}, building:{x:24,z:-6.35,w:7.4,h:9.7,d:3.0},
+      road:{x:20,z:0}, building:{x:20,z:6.35,w:7.5,h:9.7,d:3.0},
       type:'contact'
     }
   ];
@@ -81,14 +74,18 @@
 
   const byId = Object.fromEntries(stops.map((stop) => [stop.id, stop]));
   const state = {current:'accueil', target:'accueil', moving:false, speed:9.2, hovered:null};
-  let scene, camera, renderer, clock, car, raycaster, pointer, textureLoader, cityGroup, lookTarget;
+  let scene, camera, renderer, clock, car, raycaster, pointer, textureLoader, cityGroup, lookTarget, homeBillboard;
   const buildingGroups = new Map();
   const interactive = [];
   const wheels = [];
 
   function init(){
+    const requested = window.location.hash.replace('#', '');
+    const initial = byId[requested] ? requested : 'accueil';
+    state.current = initial;
+    state.target = initial;
     buildNavigation();
-    renderStop(byId.accueil);
+    renderStop(byId[initial]);
     refreshCart();
     setupEvents();
     setupThree();
@@ -99,7 +96,7 @@
     const dock = document.getElementById('routeDock');
     nav.innerHTML = stops.map((stop) => `<button class="nav-button" type="button" data-go="${stop.id}">${stop.label}</button>`).join('');
     dock.innerHTML = stops.map((stop) => `<button class="icon-step" type="button" data-go="${stop.id}" title="${stop.label}"><span class="step-light"></span><span>${stop.short}</span></button>`).join('');
-    updateActiveControls('accueil');
+    updateActiveControls(state.target);
   }
 
   function setupEvents(){
@@ -123,12 +120,6 @@
       const checkout = event.target.closest('[data-checkout]');
       if(checkout){
         checkoutCart();
-        return;
-      }
-      const secretToggle = event.target.closest('[data-secret-toggle]');
-      if(secretToggle){
-        const zone = document.getElementById('secretZone');
-        if(zone) zone.style.display = zone.style.display === 'block' ? 'none' : 'block';
         return;
       }
       const gallery = event.target.closest('[data-gallery-next]');
@@ -177,20 +168,17 @@
 
   function renderStop(stop){
     const panel = document.getElementById('storyPanel');
-    const mediaClass = stop.mediaClass ? ` ${stop.mediaClass}` : '';
+    panel.classList.toggle('is-home', stop.id === 'accueil');
     panel.innerHTML = `
-      <div class="panel-media${mediaClass}"><img src="${localAsset(stop.poster)}" alt="${stop.title}" /></div>
       <span class="kicker">${stop.kicker}</span>
       <h1>${stop.title}</h1>
-      <p>${stop.description}</p>
+      ${stop.id === 'accueil' ? '' : `<p>${stop.description}</p>`}
       ${renderStopBody(stop)}
     `;
-    wireDynamicForms(stop);
   }
 
   function renderStopBody(stop){
     if(stop.type === 'music') return renderMusic();
-    if(stop.type === 'book') return renderBook();
     if(stop.type === 'merch') return renderMerch();
     if(stop.type === 'cart') return renderCart();
     if(stop.type === 'contact') return renderContact();
@@ -210,8 +198,7 @@
     return `
       <div class="album-list">
         ${albums.map((album) => `
-          <div class="album-row">
-            <img src="${localAsset(album.image)}" alt="${album.title}" />
+          <div class="album-row text-only">
             <div>
               <div class="row-title">${album.title}</div>
               <div class="row-meta">${album.meta}</div>
@@ -219,34 +206,6 @@
             </div>
           </div>
         `).join('')}
-      </div>
-    `;
-  }
-
-  function renderBook(){
-    return `
-      <div class="product-list">
-        <div class="product-row">
-          <img src="${localAsset('assets/cover.webp')}" alt="Livre De la méthode rigide et scrupuleuse" />
-          <div>
-            <div class="row-title">Livre numérique</div>
-            <div class="row-meta">5 $</div>
-            <div class="row-actions">
-              <button class="tiny-action" type="button" data-buy-now data-product="Livre - De la méthode" data-price="5" data-zone="paypal-zone-book">Acheter</button>
-              <button class="tiny-action" type="button" data-add-cart data-product="Livre - De la méthode" data-price="5">Ajouter</button>
-              <button class="tiny-action" type="button" data-secret-toggle>Code secret</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="paypal-zone" id="paypal-zone-book"></div>
-      <div class="secret-zone" id="secretZone">
-        <form id="secretForm">
-          <input class="field" type="text" id="secretCode" name="code" placeholder="Code secret" required />
-          <input class="field" type="email" id="secretMail" name="email" placeholder="Votre email" required />
-          <button class="action" type="submit">Valider</button>
-        </form>
-        <a class="action secret-download" id="secretDownload" href="${localAsset('assets/city/book.pdf')}" download>Télécharger le livre</a>
       </div>
     `;
   }
@@ -261,7 +220,6 @@
               <div class="row-title">${product.title}</div>
               <div class="row-meta">${product.price} $</div>
               <div class="row-actions">
-                <button class="tiny-action" type="button" data-open-viewer="${product.id}">Agrandir</button>
                 <button class="tiny-action" type="button" data-gallery-next="${product.id}">Suivant</button>
                 <button class="tiny-action" type="button" data-buy-now data-product="${product.title}" data-price="${product.price}" data-zone="paypal-zone-${product.id}">Acheter</button>
                 <button class="tiny-action" type="button" data-add-cart data-product="${product.title}" data-price="${product.price}">Ajouter</button>
@@ -298,28 +256,6 @@
         <a class="ghost-action" href="https://www.instagram.com/ultimate_dini/" target="_blank" rel="noopener">Instagram</a>
       </div>
     `;
-  }
-
-  function wireDynamicForms(stop){
-    if(stop.type !== 'book') return;
-    const form = document.getElementById('secretForm');
-    if(!form) return;
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const code = document.getElementById('secretCode').value.trim();
-      const email = document.getElementById('secretMail').value.trim();
-      if(code === '500ANS'){
-        document.getElementById('secretDownload').style.display = 'inline-flex';
-        form.style.display = 'none';
-        fetch('https://formspree.io/f/xldjpwzz', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({_subject:'Accès livre gratuit', code, email})
-        }).catch(() => {});
-      }else{
-        alert('Code incorrect, réessayez.');
-      }
-    });
   }
 
   function addToCart(product, price){
@@ -456,7 +392,7 @@
     lookTarget = new THREE.Vector3(-20, 3.5, -6);
 
     renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, powerPreference:'high-performance'});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -478,12 +414,14 @@
     addGround();
     addRoad();
     addMainBuildings();
+    homeBillboard = createHomeBillboard();
+    scene.add(homeBillboard);
     addSkyline();
     addStreetDetails();
     car = createCar();
     scene.add(car);
-    car.position.set(byId.accueil.road.x, .38, 0);
-    updateBuildingFocus('accueil');
+    car.position.set(byId[state.target].road.x, .38, 0);
+    updateBuildingFocus(state.target);
 
     renderer.domElement.addEventListener('pointermove', onPointerMove);
     renderer.domElement.addEventListener('pointerleave', () => setHover(null));
@@ -634,12 +572,15 @@
     group.add(frame);
     poster.position.set(0, posterY, frontZ + posterOffset);
     poster.userData.stopId = stop.id;
+    if(stop.viewerProduct) poster.userData.viewerProduct = stop.viewerProduct;
     group.add(poster);
     interactive.push(poster);
 
     const canopy = new THREE.Mesh(new THREE.BoxGeometry(poster.userData.posterW + .75, .16, .34), trimMat);
     canopy.position.set(0, posterY + poster.userData.posterH / 2 + .28, frontZ + posterOffset * .75);
     group.add(canopy);
+
+    addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat);
 
     const label = createLabel(stop.short, stop.light);
     label.position.set(0, b.h + .55, frontZ + (b.z < 0 ? .04 : -.04));
@@ -659,16 +600,199 @@
     const texture = textureLoader.load(localAsset(stop.poster));
     texture.encoding = THREE.sRGBEncoding;
     texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
-    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.generateMipmaps = false;
+    texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
-    const mat = new THREE.MeshBasicMaterial({map:texture, toneMapped:false});
-    const posterW = Math.min(building.w * .76, 6.1);
+    const mat = new THREE.MeshBasicMaterial({map:texture, toneMapped:false, transparent:true});
+    const posterW = Math.min(building.w * .82, 6.7);
     const posterH = posterW;
     const poster = new THREE.Mesh(new THREE.PlaneGeometry(posterW, posterH), mat);
     poster.rotation.y = rotationY;
     poster.userData.posterW = posterW;
     poster.userData.posterH = posterH;
     return poster;
+  }
+
+  function addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat){
+    const front = frontZ + posterOffset * 1.35;
+    const rotationY = b.z < 0 ? 0 : Math.PI;
+    const accent = typeof stop.light === 'string' ? stop.light : '#d9e2eb';
+
+    if(stop.id === 'album'){
+      [
+        {text:'TEASER', x:-2.95, y:posterY + 2.55, w:1.85},
+        {text:'VOL.2', x:2.95, y:posterY + 2.55, w:1.85},
+        {text:'CHROME NIGHT', x:0, y:posterY - 2.8, w:3.1}
+      ].forEach((item) => {
+        const tag = createNeonPanel(item.text, accent, item.w, .58);
+        tag.position.set(item.x, item.y, front);
+        tag.rotation.y = rotationY;
+        group.add(tag);
+      });
+    }
+
+    if(stop.type === 'music'){
+      const discMat = new THREE.MeshStandardMaterial({color:0x05070b, roughness:.26, metalness:.72});
+      const rimMat = new THREE.MeshBasicMaterial({color:stop.accent});
+      [-3.35, 3.35].forEach((x) => {
+        const disc = new THREE.Mesh(new THREE.CylinderGeometry(.48, .48, .055, 40), discMat);
+        disc.rotation.x = Math.PI / 2;
+        disc.position.set(x, posterY - 2.75, front);
+        group.add(disc);
+        const center = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .06, 28), rimMat);
+        center.rotation.x = Math.PI / 2;
+        center.position.copy(disc.position);
+        center.position.z += posterOffset * .4;
+        group.add(center);
+      });
+      for(let i = 0; i < 9; i += 1){
+        const h = .38 + (i % 5) * .18;
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(.22, h, .08), trimMat);
+        bar.position.set(-1.25 + i * .31, posterY + 2.75 + h / 2, front);
+        group.add(bar);
+      }
+    }
+
+    if(stop.type === 'merch'){
+      const awningMat = new THREE.MeshStandardMaterial({color:0x10161d, roughness:.24, metalness:.58, emissive:new THREE.Color(stop.accent), emissiveIntensity:.06});
+      const awning = new THREE.Mesh(new THREE.BoxGeometry(Math.min(b.w * .82, 6.7), .32, .42), awningMat);
+      awning.position.set(0, posterY - 3.05, front);
+      group.add(awning);
+      const shop = createNeonPanel('SHOPPING', accent, 2.6, .58);
+      shop.position.set(0, posterY + 2.8, front);
+      shop.rotation.y = rotationY;
+      group.add(shop);
+      [-2.7, 2.7].forEach((x) => {
+        const display = new THREE.Mesh(new THREE.BoxGeometry(.72, .72, .42), trimMat);
+        display.position.set(x, 1.12, front);
+        group.add(display);
+      });
+    }
+
+    if(stop.type === 'cart'){
+      const checkout = createNeonPanel('CHECKOUT', accent, 2.65, .56);
+      checkout.position.set(0, posterY + 2.8, front);
+      checkout.rotation.y = rotationY;
+      group.add(checkout);
+      for(let i = 0; i < 3; i += 1){
+        const coin = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .05, 24), new THREE.MeshBasicMaterial({color:0xf0b64d}));
+        coin.rotation.x = Math.PI / 2;
+        coin.position.set(-.6 + i * .6, posterY - 2.85, front);
+        group.add(coin);
+      }
+    }
+
+    if(stop.type === 'contact'){
+      const mast = new THREE.Mesh(new THREE.CylinderGeometry(.045, .06, 2.4, 12), trimMat);
+      mast.position.set(3.15, b.h + 1.2, 0);
+      group.add(mast);
+      [.52, .82, 1.12].forEach((radius, index) => {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, .025, 8, 48), new THREE.MeshBasicMaterial({color:stop.accent, transparent:true, opacity:.72 - index * .14}));
+        ring.position.set(3.15, b.h + 2.1, 0);
+        ring.rotation.x = Math.PI / 2;
+        group.add(ring);
+      });
+    }
+  }
+
+  function createNeonPanel(text, color, width, height){
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 160;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(4,7,11,.9)';
+    ctx.fillRect(0, 0, 512, 160);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(10, 10, 492, 140);
+    ctx.font = '800 46px Montserrat, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f3f5f6';
+    ctx.fillText(text, 256, 82, 440);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+    return new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({map:texture, transparent:true, toneMapped:false}));
+  }
+
+  function createHomeBillboard(){
+    const stop = byId.accueil;
+    const group = new THREE.Group();
+    const canvas = document.createElement('canvas');
+    canvas.width = 1400;
+    canvas.height = 620;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(4,7,11,.94)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#d9e2eb';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(26, 26, canvas.width - 52, canvas.height - 52);
+    ctx.strokeStyle = '#d6ae72';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(52, 52, canvas.width - 104, canvas.height - 104);
+    ctx.font = '800 76px Cinzel, Georgia, serif';
+    ctx.fillStyle = '#f3f5f6';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Shuklel', 92, 76);
+    ctx.font = '800 28px Montserrat, Arial, sans-serif';
+    ctx.fillStyle = '#d6ae72';
+    ctx.fillText('MONTRÉAL NOCTURNE', 94, 172);
+    ctx.font = '500 42px Montserrat, Arial, sans-serif';
+    ctx.fillStyle = '#d9e2eb';
+    wrapCanvasText(ctx, stop.description, 94, 238, 1180, 58, 5);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
+    const board = new THREE.Mesh(
+      new THREE.PlaneGeometry(7.8, 3.45),
+      new THREE.MeshBasicMaterial({map:texture, toneMapped:false})
+    );
+    board.userData.stopId = 'accueil';
+    board.position.set(0, 2.95, .03);
+    group.add(board);
+    interactive.push(board);
+
+    const frameMat = new THREE.MeshStandardMaterial({color:0xb9c7d3, metalness:.88, roughness:.18});
+    const frameTop = new THREE.Mesh(new THREE.BoxGeometry(8.05, .12, .16), frameMat);
+    frameTop.position.set(0, 4.74, 0);
+    const frameBottom = frameTop.clone();
+    frameBottom.position.y = 1.16;
+    const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(.12, 3.6, .16), frameMat);
+    frameLeft.position.set(-4.05, 2.95, 0);
+    const frameRight = frameLeft.clone();
+    frameRight.position.x = 4.05;
+    group.add(frameTop, frameBottom, frameLeft, frameRight);
+    [-3.45, 3.45].forEach((x) => {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(.06, .08, 2.4, 12), frameMat);
+      post.position.set(x, .55, 0);
+      group.add(post);
+    });
+    const glow = new THREE.PointLight(stop.accent, .9, 9);
+    glow.position.set(0, 3.2, 1.6);
+    group.add(glow);
+    group.position.set(stop.road.x, 0, 2.75);
+    return group;
+  }
+
+  function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+    const words = text.split(' ');
+    let line = '';
+    let lineCount = 0;
+    for(let i = 0; i < words.length; i += 1){
+      const test = line ? line + ' ' + words[i] : words[i];
+      if(ctx.measureText(test).width > maxWidth && line){
+        ctx.fillText(line, x, y);
+        y += lineHeight;
+        line = words[i];
+        lineCount += 1;
+        if(lineCount >= maxLines - 1) break;
+      }else{
+        line = test;
+      }
+    }
+    if(line) ctx.fillText(line, x, y);
   }
 
   function createWindowTexture(color, seed){
@@ -895,7 +1019,12 @@
   function onCanvasClick(event){
     updatePointer(event);
     const hit = getIntersection();
-    if(hit) selectStop(hit.id);
+    if(!hit) return;
+    if(hit.viewerProduct && hit.id === state.target){
+      openProductViewer(hit.viewerProduct);
+      return;
+    }
+    selectStop(hit.id);
   }
 
   function updatePointer(event){
@@ -908,10 +1037,21 @@
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(interactive, true);
     if(!hits.length) return null;
-    let obj = hits[0].object;
-    while(obj){
-      if(obj.userData && obj.userData.stopId) return byId[obj.userData.stopId];
-      obj = obj.parent;
+    for(const hit of hits){
+      let obj = hit.object;
+      let visible = true;
+      while(obj){
+        if(!obj.visible) visible = false;
+        obj = obj.parent;
+      }
+      if(!visible) continue;
+      obj = hit.object;
+      while(obj){
+        if(obj.userData && obj.userData.stopId){
+          return {id:obj.userData.stopId, viewerProduct:obj.userData.viewerProduct || null};
+        }
+        obj = obj.parent;
+      }
     }
     return null;
   }
@@ -922,7 +1062,12 @@
   }
 
   function updateBuildingFocus(id){
+    const activeStop = byId[id];
+    const activeSide = Math.sign(activeStop.building.z);
+    if(homeBillboard) homeBillboard.visible = id === 'accueil';
     buildingGroups.forEach((group, key) => {
+      const stop = byId[key];
+      group.visible = key === id || Math.sign(stop.building.z) === activeSide;
       group.traverse((obj) => {
         if(obj.material && obj.material.emissiveIntensity !== undefined){
           obj.material.emissiveIntensity = key === id ? .14 : .022;
@@ -981,7 +1126,7 @@
     if(!camera || !renderer) return;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.2));
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
