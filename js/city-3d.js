@@ -4,13 +4,15 @@
   const localAsset = (path) => path.split('/').map(encodeURIComponent).join('/');
   const contactEmail = 'shukfit' + '@' + 'gmail.com';
   const cart = JSON.parse(localStorage.getItem('shuklel-cart') || '[]');
+  const mobileQuery = window.matchMedia('(max-width: 760px), (pointer: coarse)');
+  const isMobileScene = () => mobileQuery.matches;
 
   const stops = [
     {
       id:'accueil', label:'Accueil', short:'Shuklel', kicker:'Montréal nocturne', title:'Shuklel',
       description:'Artiste, producteur et rappeur basé à Montréal, Shuklel fusionne rap, afro-beat et synthwave. Plus de 150 000 écoutes et 5 000 abonnés soutiennent déjà son parcours.',
       poster:'assets/city/logo.webp', mediaClass:'logo-fit', accent:0xd9e2eb, light:'#d9e2eb',
-      road:{x:-20,z:0}, building:{x:-20,z:-6.35,w:7.5,h:8.8,d:3.0},
+      road:{x:-15,z:0}, building:{x:-15,z:-5.2,w:8.8,h:8.8,d:2.7},
       actions:[
         {kind:'link', label:'YouTube', href:'https://www.youtube.com/@shuklel'},
         {kind:'link', label:'Instagram', href:'https://www.instagram.com/ultimate_dini/'},
@@ -19,9 +21,9 @@
     },
     {
       id:'album', label:'Album', short:'RS Vol.2', kicker:'Projet mis en avant', title:'Rigide et Scrupuleux Vol.2',
-      description:'Une direction artistique sombre, premium et urbaine : chrome, nuit, ville et tension cinématique autour du nouveau projet.',
+      description:'Un nouveau chapitre se prépare. Fragments, nuit, chrome et tension : entre dans le teasing de Rigide et Scrupuleux Vol.2.',
       poster:'assets/cover.webp', accent:0xd6ae72, light:'#d6ae72',
-      road:{x:-12,z:0}, building:{x:-12,z:6.35,w:8.2,h:10.8,d:3.1},
+      road:{x:-9,z:0}, building:{x:-9,z:5.2,w:9.0,h:10.2,d:2.8},
       actions:[
         {kind:'link', label:'Écouter le projet', href:'https://distrokid.com/hyperfollow/shuklel/rigide-et-scrupuleux'},
         {kind:'go', label:'Discographie', target:'music'},
@@ -30,30 +32,30 @@
     },
     {
       id:'music', label:'Musique', short:'Music', kicker:'Catalogue', title:'Discographie',
-      description:'Les projets Shuklel réunis comme des affiches sur la skyline : chaque façade ouvre vers un album, un univers ou une époque.',
+      description:'Choisis un projet dans la discographie, puis clique pour streamer. La façade suit ta sélection.',
       poster:'assets/city/rigide.webp', accent:0x4eb7c7, light:'#4eb7c7',
-      road:{x:-4,z:0}, building:{x:-4,z:-6.35,w:8.1,h:10.2,d:3.0},
+      road:{x:-3,z:0}, building:{x:-3,z:-5.2,w:9.0,h:9.8,d:2.8},
       type:'music'
     },
     {
-      id:'merch', label:'Vêtements', short:'Merch', kicker:'Boutique', title:'Vêtements Shuklel',
-      description:'Hoodie et t-shirt dans l’esthétique sombre du projet, accessibles directement depuis le quartier merch.',
+      id:'merch', label:'Boutique', short:'Boutique', kicker:'Boutique', title:'Boutique Shuklel',
+      description:'Fais défiler les articles, touche la façade pour changer le visuel, puis ajoute la pièce au panier.',
       poster:'assets/city/hoodie-1.webp', accent:0x72b77b, light:'#72b77b',
-      road:{x:4,z:0}, building:{x:4,z:6.35,w:8.2,h:10.6,d:3.1},
+      road:{x:3,z:0}, building:{x:3,z:5.2,w:9.0,h:10.0,d:2.8},
       type:'merch', viewerProduct:'hoodie'
     },
     {
       id:'cart', label:'Panier', short:'Panier', kicker:'Commande', title:'Panier',
       description:'Les articles ajoutés restent disponibles pendant la visite.',
       poster:'assets/city/logo.webp', accent:0xf0b64d, light:'#f0b64d',
-      road:{x:12,z:0}, building:{x:12,z:-6.35,w:7.4,h:8.9,d:3.0},
+      road:{x:9,z:0}, building:{x:9,z:-5.2,w:8.4,h:8.8,d:2.7},
       type:'cart'
     },
     {
       id:'contact', label:'Contact', short:'Contact', kicker:'Réseaux', title:'Contact & Réseaux',
       description:'Booking, questions, précommande ou collaboration : le bureau reste ouvert au bout de la route.',
       poster:'assets/city/logo.webp', accent:0xd9e2eb, light:'#d9e2eb',
-      road:{x:20,z:0}, building:{x:20,z:6.35,w:7.5,h:9.7,d:3.0},
+      road:{x:15,z:0}, building:{x:15,z:5.2,w:8.4,h:9.2,d:2.7},
       type:'contact'
     }
   ];
@@ -73,11 +75,15 @@
   ];
 
   const byId = Object.fromEntries(stops.map((stop) => [stop.id, stop]));
-  const state = {current:'accueil', target:'accueil', moving:false, speed:9.2, hovered:null};
+  const state = {current:'accueil', target:'accueil', moving:false, speed:18, hovered:null};
+  const musicState = {albumIndex:0};
+  const merchState = {productId:'hoodie', imageIndex:{hoodie:0, tshirt:0}};
   let scene, camera, renderer, clock, car, raycaster, pointer, textureLoader, cityGroup, lookTarget, homeBillboard;
   const buildingGroups = new Map();
+  const posterMeshes = new Map();
   const interactive = [];
   const wheels = [];
+  let touchStart = null;
 
   function init(){
     const requested = window.location.hash.replace('#', '');
@@ -94,8 +100,11 @@
   function buildNavigation(){
     const nav = document.getElementById('navRail');
     const dock = document.getElementById('routeDock');
-    nav.innerHTML = stops.map((stop) => `<button class="nav-button" type="button" data-go="${stop.id}">${stop.label}</button>`).join('');
-    dock.innerHTML = stops.map((stop) => `<button class="icon-step" type="button" data-go="${stop.id}" title="${stop.label}"><span class="step-light"></span><span>${stop.short}</span></button>`).join('');
+    if(nav) nav.innerHTML = stops.map((stop) => `<button class="nav-button" type="button" data-go="${stop.id}">${stop.label}</button>`).join('');
+    dock.innerHTML = stops.map((stop) => {
+      const badge = stop.id === 'cart' ? '<span class="dock-badge" id="cartCountDock">0</span>' : '';
+      return `<button class="icon-step" type="button" data-go="${stop.id}" title="${stop.label}"><span class="step-light"></span><span>${stop.short}</span>${badge}</button>`;
+    }).join('');
     updateActiveControls(state.target);
   }
 
@@ -105,6 +114,11 @@
       if(go){
         event.preventDefault();
         selectStop(go.dataset.go);
+        return;
+      }
+      const floatingAdd = event.target.closest('[data-floating-add]');
+      if(floatingAdd){
+        addCurrentProductToCart();
         return;
       }
       const add = event.target.closest('[data-add-cart]');
@@ -140,6 +154,16 @@
       }
       if(event.target.closest('[data-viewer-close]') || event.target.classList.contains('product-viewer')){
         closeProductViewer();
+        return;
+      }
+      const albumSelect = event.target.closest('[data-album-index]');
+      if(albumSelect && !event.target.closest('a,button')){
+        selectAlbum(Number(albumSelect.dataset.albumIndex), true);
+        return;
+      }
+      const productSelect = event.target.closest('[data-product-select]');
+      if(productSelect && !event.target.closest('a,button')){
+        selectProduct(productSelect.dataset.productSelect, true);
       }
     });
 
@@ -150,15 +174,51 @@
       if(event.key === 'ArrowRight') stepProductViewer(viewer.dataset.product, 1);
       if(event.key === 'ArrowLeft') stepProductViewer(viewer.dataset.product, -1);
     });
+
+    setupSwipeEvents();
+
+    window.addEventListener('hashchange', () => {
+      const requested = window.location.hash.replace('#', '');
+      if(byId[requested] && requested !== state.target) selectStop(requested);
+    });
+  }
+
+  function setupSwipeEvents(){
+    const experience = document.getElementById('cityExperience');
+    if(!experience) return;
+    experience.addEventListener('touchstart', (event) => {
+      if(event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      touchStart = {x:touch.clientX, y:touch.clientY};
+    }, {passive:true});
+
+    experience.addEventListener('touchend', (event) => {
+      if(!touchStart || !event.changedTouches.length) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - touchStart.x;
+      const dy = touch.clientY - touchStart.y;
+      touchStart = null;
+      if(Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      selectRelativeStop(dx < 0 ? 1 : -1);
+    }, {passive:true});
+  }
+
+  function selectRelativeStop(delta){
+    const index = stops.findIndex((stop) => stop.id === state.target);
+    const next = Math.max(0, Math.min(stops.length - 1, index + delta));
+    if(next !== index) selectStop(stops[next].id);
   }
 
   function selectStop(id){
     const stop = byId[id];
     if(!stop) return;
+    closeProductViewer();
     state.target = id;
     renderStop(stop);
+    syncSectionVisuals(stop);
     updateActiveControls(id);
     updateBuildingFocus(id);
+    updateFloatingAdd();
     window.location.hash = id;
   }
 
@@ -168,6 +228,7 @@
 
   function renderStop(stop){
     const panel = document.getElementById('storyPanel');
+    panel.dataset.section = stop.id;
     panel.classList.toggle('is-home', stop.id === 'accueil');
     panel.innerHTML = `
       <span class="kicker">${stop.kicker}</span>
@@ -175,6 +236,7 @@
       ${stop.id === 'accueil' ? '' : `<p>${stop.description}</p>`}
       ${renderStopBody(stop)}
     `;
+    requestAnimationFrame(() => wireSectionControls(stop));
   }
 
   function renderStopBody(stop){
@@ -196,13 +258,13 @@
 
   function renderMusic(){
     return `
-      <div class="album-list">
-        ${albums.map((album) => `
-          <div class="album-row text-only">
+      <div class="album-list" data-scroll-menu="music">
+        ${albums.map((album, index) => `
+          <div class="album-row text-only${index === musicState.albumIndex ? ' is-active' : ''}" data-album-index="${index}" role="button" tabindex="0">
             <div>
               <div class="row-title">${album.title}</div>
               <div class="row-meta">${album.meta}</div>
-              <div class="row-actions"><a class="tiny-action" href="${album.href}" target="_blank" rel="noopener">Écouter</a></div>
+              <div class="row-actions"><a class="tiny-action" href="${album.href}" target="_blank" rel="noopener">Streamer</a></div>
             </div>
           </div>
         `).join('')}
@@ -212,17 +274,16 @@
 
   function renderMerch(){
     return `
-      <div class="product-list">
+      <div class="product-list" data-scroll-menu="merch">
         ${products.map((product) => `
-          <div class="product-row">
-            <img class="product-thumb" src="${localAsset(product.image)}" alt="${product.title}" id="${product.id}-image" data-index="0" data-open-viewer="${product.id}" />
+          <div class="product-row${product.id === merchState.productId ? ' is-active' : ''}" data-product-select="${product.id}" role="button" tabindex="0">
+            <img class="product-thumb" src="${localAsset(product.gallery[merchState.imageIndex[product.id] || 0])}" alt="${product.title}" id="${product.id}-image" data-index="${merchState.imageIndex[product.id] || 0}" />
             <div>
               <div class="row-title">${product.title}</div>
               <div class="row-meta">${product.price} $</div>
               <div class="row-actions">
-                <button class="tiny-action" type="button" data-gallery-next="${product.id}">Suivant</button>
+                <button class="tiny-action" type="button" data-gallery-next="${product.id}">Image</button>
                 <button class="tiny-action" type="button" data-buy-now data-product="${product.title}" data-price="${product.price}" data-zone="paypal-zone-${product.id}">Acheter</button>
-                <button class="tiny-action" type="button" data-add-cart data-product="${product.title}" data-price="${product.price}">Ajouter</button>
               </div>
               <div class="paypal-zone" id="paypal-zone-${product.id}"></div>
             </div>
@@ -258,6 +319,101 @@
     `;
   }
 
+  function wireSectionControls(stop){
+    if(stop.type === 'music'){
+      selectAlbum(musicState.albumIndex, false);
+      wireNearestScroll('.album-list', '.album-row', (row) => selectAlbum(Number(row.dataset.albumIndex), false));
+    }
+    if(stop.type === 'merch'){
+      selectProduct(merchState.productId, false);
+      wireNearestScroll('.product-list', '.product-row', (row) => selectProduct(row.dataset.productSelect, false));
+    }
+  }
+
+  function wireNearestScroll(listSelector, rowSelector, onSelect){
+    const list = document.querySelector(listSelector);
+    if(!list || list.dataset.wired === '1') return;
+    list.dataset.wired = '1';
+    let frame = 0;
+    list.addEventListener('scroll', () => {
+      if(frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rows = Array.from(list.querySelectorAll(rowSelector));
+        if(!rows.length) return;
+        const listRect = list.getBoundingClientRect();
+        const center = listRect.top + listRect.height / 2;
+        const nearest = rows.reduce((best, row) => {
+          const rect = row.getBoundingClientRect();
+          const distance = Math.abs(rect.top + rect.height / 2 - center);
+          return distance < best.distance ? {row, distance} : best;
+        }, {row:rows[0], distance:Infinity}).row;
+        onSelect(nearest);
+      });
+    }, {passive:true});
+  }
+
+  function selectAlbum(index, focusRow){
+    const albumIndex = Math.max(0, Math.min(albums.length - 1, index || 0));
+    musicState.albumIndex = albumIndex;
+    document.querySelectorAll('[data-album-index]').forEach((row) => {
+      const active = Number(row.dataset.albumIndex) === albumIndex;
+      row.classList.toggle('is-active', active);
+      if(active && focusRow) row.scrollIntoView({block:'nearest', behavior:'smooth'});
+    });
+    if(state.target === 'music') setBuildingPoster('music', albums[albumIndex].image);
+  }
+
+  function selectProduct(id, focusRow){
+    const product = products.find((item) => item.id === id) || products[0];
+    merchState.productId = product.id;
+    document.querySelectorAll('[data-product-select]').forEach((row) => {
+      const active = row.dataset.productSelect === product.id;
+      row.classList.toggle('is-active', active);
+      if(active && focusRow) row.scrollIntoView({block:'nearest', behavior:'smooth'});
+    });
+    const imageIndex = merchState.imageIndex[product.id] || 0;
+    const img = document.getElementById(product.id + '-image');
+    if(img){
+      img.dataset.index = String(imageIndex);
+      img.src = localAsset(product.gallery[imageIndex]);
+    }
+    if(state.target === 'merch') setBuildingPoster('merch', product.gallery[imageIndex]);
+    updateFloatingAdd();
+  }
+
+  function syncSectionVisuals(stop){
+    if(stop.type === 'music'){
+      selectAlbum(musicState.albumIndex, false);
+      return;
+    }
+    if(stop.type === 'merch'){
+      selectProduct(merchState.productId, false);
+      return;
+    }
+    setBuildingPoster(stop.id, stop.poster);
+  }
+
+  function currentProduct(){
+    return products.find((item) => item.id === merchState.productId) || products[0];
+  }
+
+  function addCurrentProductToCart(){
+    const product = currentProduct();
+    addToCart(product.title, product.price);
+  }
+
+  function updateFloatingAdd(){
+    const button = document.getElementById('floatingAdd');
+    if(!button) return;
+    const visible = state.target === 'merch';
+    button.classList.toggle('is-visible', visible);
+    if(!visible) return;
+    const product = currentProduct();
+    button.setAttribute('aria-label', `Ajouter ${product.title} au panier`);
+    button.innerHTML = `<span aria-hidden="true">+</span><strong>Ajouter</strong><small>${product.price} $</small>`;
+  }
+
   function addToCart(product, price){
     cart.push({product, price});
     localStorage.setItem('shuklel-cart', JSON.stringify(cart));
@@ -267,8 +423,9 @@
 
   function refreshCart(){
     const badge = document.getElementById('cartCountBadge');
-    if(!badge) return;
-    badge.textContent = String(cart.length);
+    const dockBadge = document.getElementById('cartCountDock');
+    if(badge) badge.textContent = String(cart.length);
+    if(dockBadge) dockBadge.textContent = String(cart.length);
   }
 
   function immediatePurchase(item, price, zoneId){
@@ -328,11 +485,38 @@
   function nextProductImage(id){
     const product = products.find((item) => item.id === id);
     const img = document.getElementById(id + '-image');
-    if(!product || !img) return;
-    const current = Number(img.dataset.index || 0);
+    if(!product) return;
+    const current = merchState.imageIndex[id] || 0;
     const next = (current + 1) % product.gallery.length;
-    img.dataset.index = String(next);
-    img.src = localAsset(product.gallery[next]);
+    merchState.imageIndex[id] = next;
+    if(img){
+      img.dataset.index = String(next);
+      img.src = localAsset(product.gallery[next]);
+    }
+    if(state.target === 'merch' && merchState.productId === id){
+      setBuildingPoster('merch', product.gallery[next]);
+    }
+  }
+
+  function setBuildingPoster(stopId, imagePath){
+    const poster = posterMeshes.get(stopId);
+    if(!poster || !textureLoader || !imagePath) return;
+    poster.userData.imagePath = imagePath;
+    textureLoader.load(localAsset(imagePath), (texture) => {
+      if(poster.userData.imagePath !== imagePath) return;
+      configurePosterTexture(texture);
+      if(poster.material.map) poster.material.map.dispose();
+      poster.material.map = texture;
+      poster.material.needsUpdate = true;
+    });
+  }
+
+  function configurePosterTexture(texture){
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = renderer ? Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileScene() ? 4 : 8) : 1;
+    texture.generateMipmaps = true;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
   }
 
   function openProductViewer(id, index = 0){
@@ -385,20 +569,21 @@
       return;
     }
 
+    const mobile = isMobileScene();
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x071018, 0.022);
-    camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 220);
+    scene.fog = new THREE.FogExp2(0x071018, mobile ? 0.014 : 0.02);
+    camera = new THREE.PerspectiveCamera(mobile ? 48 : 52, window.innerWidth / window.innerHeight, 0.1, 160);
     camera.position.set(-25, 10, 22);
     lookTarget = new THREE.Vector3(-20, 3.5, -6);
 
-    renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, powerPreference:'high-performance'});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.2));
+    renderer = new THREE.WebGLRenderer({antialias:!mobile, alpha:true, powerPreference:mobile ? 'low-power' : 'high-performance'});
+    renderer.setPixelRatio(scenePixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
-    renderer.shadowMap.enabled = true;
+    renderer.toneMappingExposure = mobile ? 1 : 1.08;
+    renderer.shadowMap.enabled = !mobile;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     mount.appendChild(renderer.domElement);
 
@@ -410,18 +595,17 @@
     scene.add(cityGroup);
 
     addLights();
-    addSky();
-    addGround();
     addRoad();
     addMainBuildings();
     homeBillboard = createHomeBillboard();
     scene.add(homeBillboard);
-    addSkyline();
-    addStreetDetails();
+    if(!mobile) addStreetDetails();
     car = createCar();
     scene.add(car);
     car.position.set(byId[state.target].road.x, .38, 0);
     updateBuildingFocus(state.target);
+    syncSectionVisuals(byId[state.target]);
+    updateFloatingAdd();
 
     renderer.domElement.addEventListener('pointermove', onPointerMove);
     renderer.domElement.addEventListener('pointerleave', () => setHover(null));
@@ -430,13 +614,20 @@
     animate();
   }
 
+  function scenePixelRatio(){
+    const limit = isMobileScene() ? 1.15 : 1.7;
+    return Math.min(window.devicePixelRatio || 1, limit);
+  }
+
   function addLights(){
-    scene.add(new THREE.HemisphereLight(0xb7d4e8, 0x09080a, 1.15));
-    const moon = new THREE.DirectionalLight(0xe8eef5, 1.2);
+    const mobile = isMobileScene();
+    scene.add(new THREE.HemisphereLight(0xb7d4e8, 0x09080a, mobile ? 1.35 : 1.15));
+    const moon = new THREE.DirectionalLight(0xe8eef5, mobile ? .82 : 1.2);
     moon.position.set(-22, 34, 20);
-    moon.castShadow = true;
-    moon.shadow.mapSize.set(1024, 1024);
+    moon.castShadow = !mobile;
+    if(!mobile) moon.shadow.mapSize.set(1024, 1024);
     scene.add(moon);
+    if(mobile) return;
     const redGlow = new THREE.PointLight(0xb82935, 1.15, 38);
     redGlow.position.set(20, 11, -12);
     scene.add(redGlow);
@@ -509,6 +700,7 @@
   function createBuilding(stop, index){
     const group = new THREE.Group();
     const b = stop.building;
+    const mobile = isMobileScene();
     group.position.set(b.x, 0, b.z);
     group.userData.stopId = stop.id;
 
@@ -524,8 +716,8 @@
     });
     const tower = new THREE.Mesh(new THREE.BoxGeometry(b.w, b.h, b.d), material);
     tower.position.y = b.h / 2;
-    tower.castShadow = true;
-    tower.receiveShadow = true;
+    tower.castShadow = !mobile;
+    tower.receiveShadow = !mobile;
     tower.userData.stopId = stop.id;
     group.add(tower);
     interactive.push(tower);
@@ -535,8 +727,8 @@
       new THREE.MeshStandardMaterial({color:0x0b1017, roughness:.32, metalness:.62})
     );
     base.position.y = .36;
-    base.castShadow = true;
-    base.receiveShadow = true;
+    base.castShadow = !mobile;
+    base.receiveShadow = !mobile;
     group.add(base);
 
     const trimMat = new THREE.MeshStandardMaterial({
@@ -574,6 +766,7 @@
     poster.userData.stopId = stop.id;
     if(stop.viewerProduct) poster.userData.viewerProduct = stop.viewerProduct;
     group.add(poster);
+    posterMeshes.set(stop.id, poster);
     interactive.push(poster);
 
     const canopy = new THREE.Mesh(new THREE.BoxGeometry(poster.userData.posterW + .75, .16, .34), trimMat);
@@ -591,20 +784,16 @@
 
     const beacon = new THREE.PointLight(stop.accent, .55, 10);
     beacon.position.set(0, b.h + .8, 0);
-    group.add(beacon);
+    if(!mobile) group.add(beacon);
 
     return group;
   }
 
   function createPoster(stop, building, rotationY){
     const texture = textureLoader.load(localAsset(stop.poster));
-    texture.encoding = THREE.sRGBEncoding;
-    texture.anisotropy = renderer ? renderer.capabilities.getMaxAnisotropy() : 1;
-    texture.generateMipmaps = false;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
+    configurePosterTexture(texture);
     const mat = new THREE.MeshBasicMaterial({map:texture, toneMapped:false, transparent:true});
-    const posterW = Math.min(building.w * .82, 6.7);
+    const posterW = Math.min(building.w * .9, 7.6);
     const posterH = posterW;
     const poster = new THREE.Mesh(new THREE.PlaneGeometry(posterW, posterH), mat);
     poster.rotation.y = rotationY;
@@ -719,6 +908,7 @@
   function createHomeBillboard(){
     const stop = byId.accueil;
     const group = new THREE.Group();
+    const mobile = isMobileScene();
     const canvas = document.createElement('canvas');
     canvas.width = 1400;
     canvas.height = 620;
@@ -769,9 +959,11 @@
       post.position.set(x, .55, 0);
       group.add(post);
     });
-    const glow = new THREE.PointLight(stop.accent, .9, 9);
-    glow.position.set(0, 3.2, 1.6);
-    group.add(glow);
+    if(!mobile){
+      const glow = new THREE.PointLight(stop.accent, .9, 9);
+      glow.position.set(0, 3.2, 1.6);
+      group.add(glow);
+    }
     group.position.set(stop.road.x, 0, 2.75);
     return group;
   }
@@ -893,6 +1085,7 @@
 
   function createCar(){
     const group = new THREE.Group();
+    const mobile = isMobileScene();
     const bodyMat = new THREE.MeshStandardMaterial({color:0x090a0d, metalness:.72, roughness:.22});
     const accentMat = new THREE.MeshStandardMaterial({color:0x161b20, metalness:.62, roughness:.2});
     const chrome = new THREE.MeshStandardMaterial({color:0xd9e2eb, metalness:.96, roughness:.14});
@@ -976,8 +1169,8 @@
 
     const wheelMat = new THREE.MeshStandardMaterial({color:0x040506, metalness:.5, roughness:.4});
     const rimMat = new THREE.MeshStandardMaterial({color:0xd9e2eb, metalness:.9, roughness:.16});
-    const wheelGeo = new THREE.CylinderGeometry(.31, .31, .25, 28);
-    const rimGeo = new THREE.TorusGeometry(.19, .025, 8, 28);
+    const wheelGeo = new THREE.CylinderGeometry(.31, .31, .25, mobile ? 18 : 28);
+    const rimGeo = new THREE.TorusGeometry(.19, .025, 8, mobile ? 18 : 28);
     [[-1.05,-.66],[1.05,-.66],[-1.05,.66],[1.05,.66]].forEach(([x,z]) => {
       const wheel = new THREE.Mesh(wheelGeo, wheelMat);
       wheel.rotation.x = Math.PI / 2;
@@ -992,21 +1185,29 @@
       group.add(rim);
     });
 
-    const coneMat = new THREE.MeshBasicMaterial({color:0xf4e4b8, transparent:true, opacity:.16, depthWrite:false});
-    const coneGeo = new THREE.ConeGeometry(.48, 4.2, 24, 1, true);
-    [-.34,.34].forEach((z) => {
-      const beam = new THREE.Mesh(coneGeo, coneMat);
-      beam.rotation.z = -Math.PI / 2;
-      beam.position.set(3.35, .42, z);
-      group.add(beam);
-    });
+    if(!mobile){
+      const coneMat = new THREE.MeshBasicMaterial({color:0xf4e4b8, transparent:true, opacity:.16, depthWrite:false});
+      const coneGeo = new THREE.ConeGeometry(.48, 4.2, 24, 1, true);
+      [-.34,.34].forEach((z) => {
+        const beam = new THREE.Mesh(coneGeo, coneMat);
+        beam.rotation.z = -Math.PI / 2;
+        beam.position.set(3.35, .42, z);
+        group.add(beam);
+      });
 
-    const spot = new THREE.SpotLight(0xf4e4b8, 1.4, 18, .34, .45, 1.2);
-    spot.position.set(1.3, .62, 0);
-    const target = new THREE.Object3D();
-    target.position.set(8, .15, 0);
-    spot.target = target;
-    group.add(spot, target);
+      const spot = new THREE.SpotLight(0xf4e4b8, 1.4, 18, .34, .45, 1.2);
+      spot.position.set(1.3, .62, 0);
+      const target = new THREE.Object3D();
+      target.position.set(8, .15, 0);
+      spot.target = target;
+      group.add(spot, target);
+    }
+    if(mobile){
+      group.traverse((obj) => {
+        obj.castShadow = false;
+        obj.receiveShadow = false;
+      });
+    }
     return group;
   }
 
@@ -1020,8 +1221,12 @@
     updatePointer(event);
     const hit = getIntersection();
     if(!hit) return;
-    if(hit.viewerProduct && hit.id === state.target){
-      openProductViewer(hit.viewerProduct);
+    if(hit.id === state.target && hit.id === 'merch'){
+      nextProductImage(merchState.productId);
+      return;
+    }
+    if(hit.id === state.target && hit.id === 'music'){
+      window.open(albums[musicState.albumIndex].href, '_blank', 'noopener');
       return;
     }
     selectStop(hit.id);
@@ -1064,10 +1269,11 @@
   function updateBuildingFocus(id){
     const activeStop = byId[id];
     const activeSide = Math.sign(activeStop.building.z);
+    const mobile = isMobileScene();
     if(homeBillboard) homeBillboard.visible = id === 'accueil';
     buildingGroups.forEach((group, key) => {
       const stop = byId[key];
-      group.visible = key === id || Math.sign(stop.building.z) === activeSide;
+      group.visible = key === id || (!mobile && Math.sign(stop.building.z) === activeSide);
       group.traverse((obj) => {
         if(obj.material && obj.material.emissiveIntensity !== undefined){
           obj.material.emissiveIntensity = key === id ? .14 : .022;
@@ -1082,11 +1288,13 @@
     const dt = Math.min(clock.getDelta(), .033);
     updateCar(dt);
     updateCamera();
-    const time = clock.elapsedTime;
-    buildingGroups.forEach((group, key) => {
-      const active = key === state.target;
-      group.position.y = active ? Math.sin(time * 2.4) * .035 : 0;
-    });
+    if(!isMobileScene()){
+      const time = clock.elapsedTime;
+      buildingGroups.forEach((group, key) => {
+        const active = key === state.target;
+        group.position.y = active ? Math.sin(time * 2.4) * .035 : 0;
+      });
+    }
     renderer.render(scene, camera);
   }
 
@@ -1104,30 +1312,32 @@
       state.current = state.target;
       updateBuildingFocus(state.current);
     }
-    car.position.z += (stop.road.z - car.position.z) * .08;
+    car.position.z += (stop.road.z - car.position.z) * (isMobileScene() ? .16 : .08);
   }
 
   function updateCamera(){
     const stop = byId[state.target];
     const side = stop.building.z < 0 ? 1 : -1;
-    const mobile = window.innerWidth < 720;
+    const mobile = isMobileScene();
     const desired = new THREE.Vector3(
-      stop.road.x + (mobile ? 0 : side * 1.2),
-      mobile ? 9.4 : 7.2,
-      side * (mobile ? 17.5 : 13.6)
+      stop.road.x + (mobile ? 0 : side * 1.1),
+      mobile ? 7.9 : 7.2,
+      side * (mobile ? 12.4 : 13.6)
     );
-    camera.position.lerp(desired, .055);
-    const desiredLook = new THREE.Vector3(stop.building.x, mobile ? 4.2 : 4.6, stop.building.z * .72);
-    lookTarget.lerp(desiredLook, .1);
+    camera.position.lerp(desired, mobile ? .14 : .07);
+    const desiredLook = new THREE.Vector3(stop.building.x, mobile ? 4.35 : 4.6, stop.building.z * .62);
+    lookTarget.lerp(desiredLook, mobile ? .18 : .1);
     camera.lookAt(lookTarget);
   }
 
   function onResize(){
     if(!camera || !renderer) return;
     camera.aspect = window.innerWidth / window.innerHeight;
+    camera.fov = isMobileScene() ? 48 : 52;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.2));
+    renderer.setPixelRatio(scenePixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight);
+    updateBuildingFocus(state.target);
   }
 
   init();

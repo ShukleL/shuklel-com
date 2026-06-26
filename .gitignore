@@ -1,3 +1,4 @@
 .netlify/
+.edge-profile/
 .DS_Store
 Thumbs.db
