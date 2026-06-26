@@ -231,8 +231,6 @@
     panel.dataset.section = stop.id;
     panel.classList.toggle('is-home', stop.id === 'accueil');
     panel.innerHTML = `
-      <span class="kicker">${stop.kicker}</span>
-      <h1>${stop.title}</h1>
       ${stop.id === 'accueil' ? '' : `<p>${stop.description}</p>`}
       ${renderStopBody(stop)}
     `;
@@ -775,8 +773,8 @@
 
     addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat);
 
-    const label = createLabel(stop.short, stop.light);
-    label.position.set(0, b.h + .55, frontZ + (b.z < 0 ? .04 : -.04));
+    const label = createLabel(stop.title, stop.light, Math.min(b.w * .76, 6.2));
+    label.position.set(0, .95, frontZ + (b.z < 0 ? .08 : -.08));
     label.rotation.y = b.z < 0 ? 0 : Math.PI;
     label.userData.stopId = stop.id;
     group.add(label);
@@ -1019,25 +1017,30 @@
     return texture;
   }
 
-  function createLabel(text, color){
+  function createLabel(text, color, width = 4.8){
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 128;
+    canvas.width = 1024;
+    canvas.height = 180;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, 512, 128);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'rgba(5,8,12,.82)';
-    ctx.fillRect(18, 28, 476, 72);
+    ctx.fillRect(26, 34, canvas.width - 52, 112);
     ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(18, 28, 476, 72);
-    ctx.font = '700 38px Cinzel, Georgia, serif';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(26, 34, canvas.width - 52, 112);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#f3f5f6';
-    ctx.fillText(text, 256, 65, 430);
+    let size = 48;
+    do{
+      ctx.font = `800 ${size}px Cinzel, Georgia, serif`;
+      size -= 2;
+    }while(ctx.measureText(text).width > 850 && size > 26);
+    ctx.fillText(text, canvas.width / 2, 91, 860);
     const texture = new THREE.CanvasTexture(canvas);
     texture.encoding = THREE.sRGBEncoding;
-    return new THREE.Mesh(new THREE.PlaneGeometry(3.8, .95), new THREE.MeshBasicMaterial({map:texture, transparent:true}));
+    texture.anisotropy = renderer ? Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileScene() ? 4 : 8) : 1;
+    return new THREE.Mesh(new THREE.PlaneGeometry(width, .82), new THREE.MeshBasicMaterial({map:texture, transparent:true, toneMapped:false}));
   }
 
   function addSkyline(){
