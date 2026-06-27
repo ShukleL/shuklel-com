@@ -569,14 +569,15 @@ footer{
   .story-panel{
     left:12px;
     right:12px;
-    bottom:calc(178px + env(safe-area-inset-bottom));
+    top:clamp(230px, 31vh, 360px);
+    bottom:auto;
     width:auto;
-    max-height:30vh;
+    max-height:24vh;
     padding:10px;
   }
-  .story-panel[data-section="music"],.story-panel[data-section="merch"]{max-height:30vh}
-  .story-panel[data-section="merch"]{bottom:calc(238px + env(safe-area-inset-bottom));max-height:25vh}
-  .album-list,.product-list{max-height:18vh}
+  .story-panel[data-section="music"],.story-panel[data-section="merch"]{max-height:28vh}
+  .story-panel[data-section="merch"]{top:clamp(250px, 34vh, 390px);bottom:auto;max-height:27vh}
+  .album-list,.product-list{max-height:17vh}
   .panel-media{aspect-ratio:1/1;max-height:30vh;margin-bottom:10px}
   .story-panel h1,.story-panel h2{font-size:1.34rem}
   .story-panel p{font-size:.86rem}
