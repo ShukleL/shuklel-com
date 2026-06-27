@@ -570,7 +570,7 @@
     const mobile = isMobileScene();
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x071018, mobile ? 0.014 : 0.02);
-    camera = new THREE.PerspectiveCamera(mobile ? 48 : 52, window.innerWidth / window.innerHeight, 0.1, 160);
+    camera = new THREE.PerspectiveCamera(mobile ? 54 : 52, window.innerWidth / window.innerHeight, 0.1, 160);
     camera.position.set(-25, 10, 22);
     lookTarget = new THREE.Vector3(-20, 3.5, -6);
 
@@ -771,6 +771,7 @@
     canopy.position.set(0, posterY + poster.userData.posterH / 2 + .28, frontZ + posterOffset * .75);
     group.add(canopy);
 
+    addBuildingMenu(group, stop, b, frontZ, posterY, posterOffset, poster.userData.posterH);
     addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat);
 
     const label = createLabel(stop.title, stop.light, Math.min(b.w * .76, 6.2));
@@ -800,23 +801,59 @@
     return poster;
   }
 
+  function addBuildingMenu(group, currentStop, b, frontZ, posterY, posterOffset, posterH){
+    const rotationY = b.z < 0 ? 0 : Math.PI;
+    const menuWidth = Math.min(b.w * .86, 7.7);
+    const gap = .06;
+    const buttonWidth = (menuWidth - gap * (stops.length - 1)) / stops.length;
+    const y = Math.min(b.h + .36, posterY + posterH / 2 + .74);
+    const z = frontZ + posterOffset * 1.65;
+    const start = -menuWidth / 2 + buttonWidth / 2;
+
+    stops.forEach((target, index) => {
+      const button = createBuildingMenuButton(target, target.id === currentStop.id, currentStop.light, buttonWidth, .42);
+      button.position.set(start + index * (buttonWidth + gap), y, z);
+      button.rotation.y = rotationY;
+      button.userData.stopId = target.id;
+      group.add(button);
+      interactive.push(button);
+    });
+  }
+
+  function createBuildingMenuButton(target, active, color, width, height){
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 180;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    if(active){
+      gradient.addColorStop(0, '#d9e2eb');
+      gradient.addColorStop(1, '#d6ae72');
+    }else{
+      gradient.addColorStop(0, 'rgba(5,8,12,.92)');
+      gradient.addColorStop(1, 'rgba(16,24,34,.88)');
+    }
+    ctx.fillStyle = gradient;
+    ctx.fillRect(18, 34, canvas.width - 36, 112);
+    ctx.strokeStyle = active ? '#f3f5f6' : color;
+    ctx.lineWidth = active ? 7 : 5;
+    ctx.strokeRect(18, 34, canvas.width - 36, 112);
+    ctx.font = '800 42px Montserrat, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = active ? '#10141a' : '#f3f5f6';
+    ctx.fillText(target.short, canvas.width / 2, 91, 430);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = renderer ? Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileScene() ? 4 : 8) : 1;
+    return new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({map:texture, transparent:true, toneMapped:false}));
+  }
+
   function addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat){
     const front = frontZ + posterOffset * 1.35;
     const rotationY = b.z < 0 ? 0 : Math.PI;
     const accent = typeof stop.light === 'string' ? stop.light : '#d9e2eb';
-
-    if(stop.id === 'album'){
-      [
-        {text:'TEASER', x:-2.95, y:posterY + 2.55, w:1.85},
-        {text:'VOL.2', x:2.95, y:posterY + 2.55, w:1.85},
-        {text:'CHROME NIGHT', x:0, y:posterY - 2.8, w:3.1}
-      ].forEach((item) => {
-        const tag = createNeonPanel(item.text, accent, item.w, .58);
-        tag.position.set(item.x, item.y, front);
-        tag.rotation.y = rotationY;
-        group.add(tag);
-      });
-    }
 
     if(stop.type === 'music'){
       const discMat = new THREE.MeshStandardMaterial({color:0x05070b, roughness:.26, metalness:.72});
@@ -1324,11 +1361,11 @@
     const mobile = isMobileScene();
     const desired = new THREE.Vector3(
       stop.road.x + (mobile ? 0 : side * 1.1),
-      mobile ? 7.9 : 7.2,
-      side * (mobile ? 12.4 : 13.6)
+      mobile ? 8.9 : 7.2,
+      side * (mobile ? 16.8 : 13.6)
     );
     camera.position.lerp(desired, mobile ? .14 : .07);
-    const desiredLook = new THREE.Vector3(stop.building.x, mobile ? 4.35 : 4.6, stop.building.z * .62);
+    const desiredLook = new THREE.Vector3(stop.building.x, mobile ? 4.65 : 4.6, stop.building.z * .62);
     lookTarget.lerp(desiredLook, mobile ? .18 : .1);
     camera.lookAt(lookTarget);
   }
@@ -1336,7 +1373,7 @@
   function onResize(){
     if(!camera || !renderer) return;
     camera.aspect = window.innerWidth / window.innerHeight;
-    camera.fov = isMobileScene() ? 48 : 52;
+    camera.fov = isMobileScene() ? 54 : 52;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(scenePixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight);
