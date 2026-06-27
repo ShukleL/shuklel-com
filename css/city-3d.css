@@ -569,24 +569,24 @@ footer{
   .story-panel{
     left:12px;
     right:12px;
-    bottom:calc(14px + env(safe-area-inset-bottom));
+    bottom:calc(178px + env(safe-area-inset-bottom));
     width:auto;
-    max-height:32vh;
+    max-height:30vh;
     padding:10px;
   }
-  .story-panel[data-section="music"],.story-panel[data-section="merch"]{max-height:34vh}
-  .story-panel[data-section="merch"]{bottom:calc(72px + env(safe-area-inset-bottom));max-height:27vh}
-  .album-list,.product-list{max-height:22vh}
+  .story-panel[data-section="music"],.story-panel[data-section="merch"]{max-height:30vh}
+  .story-panel[data-section="merch"]{bottom:calc(238px + env(safe-area-inset-bottom));max-height:25vh}
+  .album-list,.product-list{max-height:18vh}
   .panel-media{aspect-ratio:1/1;max-height:30vh;margin-bottom:10px}
   .story-panel h1,.story-panel h2{font-size:1.34rem}
   .story-panel p{font-size:.86rem}
   .floating-add{
-    bottom:calc(16px + env(safe-area-inset-bottom));
+    bottom:calc(74px + env(safe-area-inset-bottom));
     min-height:44px;
     min-width:176px;
     padding:9px 14px;
   }
-  .route-dock{display:none}
+  .route-dock{bottom:calc(10px + env(safe-area-inset-bottom));max-width:calc(100vw - 18px);padding:6px;gap:6px}
   .icon-step{min-height:42px;padding:7px 9px;font-size:.72rem}
   .step-light{width:9px;height:9px}
   .scene-credit{display:none}

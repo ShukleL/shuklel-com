@@ -771,7 +771,6 @@
     canopy.position.set(0, posterY + poster.userData.posterH / 2 + .28, frontZ + posterOffset * .75);
     group.add(canopy);
 
-    addBuildingMenu(group, stop, b, frontZ, posterY, posterOffset, poster.userData.posterH);
     addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat);
 
     const label = createLabel(stop.title, stop.light, Math.min(b.w * .76, 6.2));
@@ -799,55 +798,6 @@
     poster.userData.posterW = posterW;
     poster.userData.posterH = posterH;
     return poster;
-  }
-
-  function addBuildingMenu(group, currentStop, b, frontZ, posterY, posterOffset, posterH){
-    const rotationY = b.z < 0 ? 0 : Math.PI;
-    const menuWidth = Math.min(b.w * .86, 7.7);
-    const gap = .06;
-    const buttonWidth = (menuWidth - gap * (stops.length - 1)) / stops.length;
-    const y = Math.min(b.h + .36, posterY + posterH / 2 + .74);
-    const z = frontZ + posterOffset * 1.65;
-    const start = -menuWidth / 2 + buttonWidth / 2;
-
-    stops.forEach((target, index) => {
-      const button = createBuildingMenuButton(target, target.id === currentStop.id, currentStop.light, buttonWidth, .42);
-      button.position.set(start + index * (buttonWidth + gap), y, z);
-      button.rotation.y = rotationY;
-      button.userData.stopId = target.id;
-      group.add(button);
-      interactive.push(button);
-    });
-  }
-
-  function createBuildingMenuButton(target, active, color, width, height){
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 180;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    if(active){
-      gradient.addColorStop(0, '#d9e2eb');
-      gradient.addColorStop(1, '#d6ae72');
-    }else{
-      gradient.addColorStop(0, 'rgba(5,8,12,.92)');
-      gradient.addColorStop(1, 'rgba(16,24,34,.88)');
-    }
-    ctx.fillStyle = gradient;
-    ctx.fillRect(18, 34, canvas.width - 36, 112);
-    ctx.strokeStyle = active ? '#f3f5f6' : color;
-    ctx.lineWidth = active ? 7 : 5;
-    ctx.strokeRect(18, 34, canvas.width - 36, 112);
-    ctx.font = '800 42px Montserrat, Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = active ? '#10141a' : '#f3f5f6';
-    ctx.fillText(target.short, canvas.width / 2, 91, 430);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
-    texture.anisotropy = renderer ? Math.min(renderer.capabilities.getMaxAnisotropy(), isMobileScene() ? 4 : 8) : 1;
-    return new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({map:texture, transparent:true, toneMapped:false}));
   }
 
   function addSectionFlavor(group, stop, b, frontZ, posterY, posterOffset, trimMat){
