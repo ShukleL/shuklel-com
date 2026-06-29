@@ -9,8 +9,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google-adsense-account" content="ca-pub-7557967332874436" />
-  <meta name="description" content="Shuklel, artiste, producteur et rappeur basé à Montréal. Une ville 3D nocturne pour explorer album, musique, vêtements et contact." />
+  <meta name="description" content="Shuklel, artiste, producteur et rappeur base a Montreal. Un bureau interactif facon dossier confidentiel pour explorer album, musique, boutique, panier et contact." />
   <title>Shuklel</title>
+
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-JN1F305PY7"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -19,7 +20,8 @@
     gtag('config', 'G-JN1F305PY7');
   </script>
 
-  <link rel="preload" as="image" href="assets/city-bg-mobile.webp" type="image/webp" />
+  <link rel="preload" as="image" href="assets/desk-scene-mobile.webp" type="image/webp" media="(max-width: 720px)" />
+  <link rel="preload" as="image" href="assets/desk-scene.webp" type="image/webp" media="(min-width: 721px)" />
   <link rel="preload" as="image" href="assets/cover.webp" />
   <link rel="preload" as="image" href="assets/city/logo.webp" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/city/favicon.png" />
@@ -27,29 +29,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/city-3d.css" />
 
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script defer src="https://www.paypal.com/sdk/js?client-id=AUESTSxCQgivh4N5isRmQmLi83WZzOiM2S_UK8ljUopiYrkaj3rSQKDA3oFx7aN7Qh1jT4yhqB2m8Z9z&currency=USD"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7557967332874436" crossorigin="anonymous"></script>
   <script defer src="js/city-3d.js"></script>
 </head>
 <body>
-  <main class="city-experience" id="cityExperience">
-    <div class="city-canvas" id="cityCanvas" aria-hidden="true"></div>
-
-    <header class="topbar">
-      <a class="brand" href="#accueil" data-go="accueil" aria-label="Shuklel accueil">
-        <img src="assets/city/logo.webp" alt="Logo Shuklel" />
-        <span>Shuklel</span>
-      </a>
-      <nav class="nav-rail" id="navRail" aria-label="Navigation principale"></nav>
-      <button class="cart-button" type="button" data-go="cart">Panier <span class="cart-badge" id="cartCountBadge">0</span></button>
-    </header>
-
-    <aside class="story-panel" id="storyPanel" aria-live="polite"></aside>
+  <main class="city-experience desk-experience" id="cityExperience" data-section="accueil">
+    <div class="desk-world" id="deskWorld" aria-label="Bureau interactif Shuklel"></div>
+    <aside class="story-panel case-panel" id="storyPanel" aria-live="polite"></aside>
     <button class="floating-add" id="floatingAdd" type="button" data-floating-add aria-label="Ajouter l'article au panier"></button>
     <div class="route-dock" id="routeDock" aria-label="Trajet"></div>
-    <footer>© 2026 Shuklel - Tous droits réservés.</footer>
-    <div class="scene-credit">Rigide et Scrupuleux Vol.2</div>
+    <footer>&copy; 2026 Shuklel - Tous droits reserves.</footer>
   </main>
 
   <noscript>
@@ -57,7 +47,7 @@
       <div class="fallback-inner">
         <img src="assets/city/logo.webp" alt="Logo Shuklel" />
         <h1>Shuklel</h1>
-        <p>Active JavaScript pour ouvrir la ville interactive.</p>
+        <p>Active JavaScript pour ouvrir le bureau interactif.</p>
       </div>
     </section>
   </noscript>
